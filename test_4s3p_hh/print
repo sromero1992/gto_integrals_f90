@@ -1,0 +1,547 @@
+ number of S P D functions :            7
+ Successful allocation of needed arrays for objects
+ functions S and supplemental:            4 ,           0
+ functions P and supplemental:            3 ,           0
+ functions D and supplemental:            0 ,           0
+ total number of gaussians (superposition):            2
+ allocation completed
+ total number of bare gaussian (           1 ) :            6
+ total number of basis functions(           1 ) :            7
+ size of gaussian basis coefficients C(ib,ibas) :          42
+ Number of Gaussian basis functions:            7
+ NBAS :           26
+
+ S MATRIX CREATED :
+
+ T MATRIX CREATED:
+
+ Ven MATRIX CREATED :
+
+
+ NBAS( NBAS + 1 )/2 :         351
+ Number of elements in S_VEC :          351
+ Number of non-zero elements in S_VEC :          123
+ READING OVLBABY 
+ nrec file :         351
+ READING HAMBABY 
+ nrec file :         351
+ OVLBABY total elements :         351
+ OVLBABY non-zero elements :         123
+ S_VEC---OVLBABY similar non-zero elements elements :         123
+ HAMBABY total elements :         351
+ HAMBABY non-zero elements :         123
+ T_VEC---HAMBABY similar non-zero elements elements :         123
+ DIAGONALIZE S_MAT
+ SIZE OF S_MAT:         676
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ END OF DIAG FOR S_MAT
+
+  PREPATATION FOR SCF CYCLE
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%% SCF CYCLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ ITERATION :           1
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.454183000000000       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -7.8866685858014982       -166.10377887527378     
+ ENERGY IS :   -7.8866685858014982     
+ ITERATION :           2
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.430448999999982       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -196.96823801095826       -3065.0228923627715     
+ ENERGY IS :   -196.96823801095826     
+ ITERATION :           3
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.435373999999996       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -204.45644114576774        2887.4865102890653     
+ ENERGY IS :   -204.45644114576774     
+ ITERATION :           4
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.222218999999996       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -206.48883697652428       -3105.2612408362311     
+ ENERGY IS :   -206.48883697652428     
+ ITERATION :           5
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.227701000000025       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -204.58619817732236        2907.5695938266963     
+ ENERGY IS :   -204.58619817732236     
+ ITERATION :           6
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.246242999999993       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -206.56964050325271       -3095.9986408031050     
+ ENERGY IS :   -206.56964050325271     
+ ITERATION :           7
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.262913000000026       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -204.57307391533126        2909.4050659959157     
+ ENERGY IS :   -204.57307391533126     
+ ITERATION :           8
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.283455999999944       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -206.57570023340719       -3094.8580842664469     
+ ENERGY IS :   -206.57570023340719     
+ ITERATION :           9
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.301615999999967       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -204.57117103664868        2909.6095742922480     
+ ENERGY IS :   -204.57117103664868     
+ ITERATION :          10
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.306632000000036       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -206.57636002936795       -3094.7246775253093     
+ ENERGY IS :   -206.57636002936795     
+ ITERATION :          11
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.235024000000067       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -204.57094481172717        2909.6332187865460     
+ ENERGY IS :   -204.57094481172717     
+ ITERATION :          12
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.355006000000003       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -206.57643610139479       -3094.7091633969558     
+ ENERGY IS :   -206.57643610139479     
+ ITERATION :          13
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.275461999999948       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -204.57091845463194        2909.6359647432837     
+ ENERGY IS :   -204.57091845463194     
+ ITERATION :          14
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.659900000000107       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -206.57644493338751       -3094.7073604427837     
+ ENERGY IS :   -206.57644493338751     
+ ITERATION :          15
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    68.600197000000094       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -204.57091539309388        2909.6362838864225     
+ ENERGY IS :   -204.57091539309388     
+ ITERATION :          16
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.936582999999928       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -206.57644598096624       -3094.7071515232556     
+ ENERGY IS :   -206.57644598096624     
+ ITERATION :          17
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.298203000000058       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -204.57091524918889        2909.6363281788654     
+ ENERGY IS :   -204.57091524918889     
+ ITERATION :          18
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.504613999999947       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -206.57644817834102       -3094.7071848057985     
+ ENERGY IS :   -206.57644817834102     
+ ITERATION :          19
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.899134999999887       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -204.57093580714314        2909.6370332055512     
+ ENERGY IS :   -204.57093580714314     
+ ITERATION :          20
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    68.241786000000047       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -206.57664999457330       -3094.7127781623080     
+ ENERGY IS :   -206.57664999457330     
+ ITERATION :          21
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.414249999999811       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -204.57293612213564        2909.7050749421669     
+ ENERGY IS :   -204.57293612213564     
+ ITERATION :          22
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.335276000000022       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -206.59624288821226       -3095.2558853422393     
+ ENERGY IS :   -206.59624288821226     
+ ITERATION :          23
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.337611000000152       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -204.76683306685840        2916.2746704234587     
+ ENERGY IS :   -204.76683306685840     
+ ITERATION :          24
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.357034999999996       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -208.46489971199156       -3145.0837220376375     
+ ENERGY IS :   -208.46489971199156     
+ ITERATION :          25
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.417412999999897       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -220.99736143546352        3322.2957710092569     
+ ENERGY IS :   -220.99736143546352     
+ ITERATION :          26
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.513500999999906       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -289.77791029396826       -3605.6276183557402     
+ ENERGY IS :   -289.77791029396826     
+ ITERATION :          27
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.423760000000129       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -384.02223842898337        2354.6950641762555     
+ ENERGY IS :   -384.02223842898337     
+ ITERATION :          28
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.438550000000077       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -423.72111716941663       -1232.0825543593751     
+ ENERGY IS :   -423.72111716941663     
+ ITERATION :          29
+ BUILDING COULOM INIT
+
+ Number of elements in COUL_VEC :          351
+ Number of non-zero elements in COUL_VEC :          351
+ Coulomb time :    67.484606999999869       sec
+
+ DSYEV TO FIND EVALUES AND EVECTORS:
+ SIZE OF Fp_MAT, NBAS:         676          26
+ WORK QUERY (LWORK)         884
+ INFO :            0
+ DSYEV finished successfully
+ BUILDING DENSITY
+ TOTAL NUMBER OF ELECTRONS :            2
+ END OF DENSITY BUILDING
+ ENERGY IN GET_ENERGY:   -431.75879610628897        391.20323755951398     
+ ENERGY IS :   -431.75879610628897     
+ FINAL ENERGY :   -431.25828508453577     
+ FINAL ENERGY :   -431.25828508453577     

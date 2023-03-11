@@ -1,0 +1,435 @@
+module class_basis_function
+  implicit none
+  private
+  public  :: gaussian !, normalize
+  real    :: pi = 3.1415926535897931d0 ! Class-wide private constant
+!  integer :: fact2 
+
+  type gaussian
+      !real(8), allocatable :: coef,exps
+      real(8), pointer :: coef(:) => null()
+      real(8), pointer :: exps(:) => null()
+      real(8), pointer :: norm(:) => null()
+      real(8) :: origin(3)
+      integer :: shell(3), nb, nbas !nb => number of bare gaussians
+                                    !nbas >= nb   nbas = n_sf + 3*n_pf + 6*n_df  (number of basis functions {S P F} )
+  contains 
+      procedure, public :: print_gaussian_info 
+      procedure, public :: allocation
+      procedure, public :: normalization
+      !procedure, public :: read_gaussian
+  end type gaussian 
+contains
+  subroutine print_gaussian_info(this)
+     class(gaussian), intent(inout) :: this
+       write(*,*) '###########################################' 
+       write(*,*) 'Atomic coordinates: ',this%origin(:)   
+       write(*,*) 'Number of basis: ',this%nb   
+       write(*,*) 'Gaussian exponents: ',this%exps(:)  
+       write(*,*) 'Gaussian coefficients: ',this%coef(:)   
+       write(*,*) 'Normalization: ',this%norm   
+       write(*,*) 'Electronic shell: ',this%shell(:)  
+       write(*,*) '###########################################' 
+  end subroutine
+  subroutine allocation(this)
+     class(gaussian), intent(inout) :: this
+       allocate(this%exps(this%nb))
+       allocate(this%coef(this%nb))
+       allocate(this%norm(this%nb))
+  end subroutine
+  subroutine normalization(this)  
+     class(gaussian), intent(inout) :: this
+       integer :: l, m, n, ll, fact2, nb, ia, ib
+       real(8) :: p1, Nor, p ! p1 prefactor
+       l = this%shell(1)
+       m = this%shell(2)
+       n = this%shell(3)
+       ll= l + m + n
+       !this%norm is an array of equal lenght to the number of primitive gaussians
+       !it is normalized first the primivitve bare gaussian functions 
+       this%norm = (2**(2*ll+1.5d0) * this%exps**(ll+1.5d0) / (fact2(2*l-1) * fact2(2*m-1) * fact2(2*n-1) *pi**1.5d0 )  )**0.5d0
+       p1 = pi**1.5d0 * fact2( 2*l-1 ) * fact2( 2*m-1 )*fact2( 2*n-1 )/2**ll
+
+       Nor = 0.0d0
+       nb = this%nb
+       do ia = 1, nb
+          do ib = 1, nb
+                p = this%exps(ia) + this%exps(ib)
+                Nor = Nor + this%norm(ia) * this%norm(ib) * this%coef(ia) * this%coef(ib) / p**1.5d0
+          end do
+       end do
+       Nor = Nor * p1
+       Nor = Nor**(-0.5d0)
+      do ia = 1, nb
+            this%coef(ia) = this%coef(ia) * Nor 
+      end do
+  end subroutine
+end module class_basis_function
+!************************************************************************************
+
+!************************************************************************************
+module  integral 
+  !This module/class is defines to introduce two gaussian classes into a function
+  use class_basis_function 
+  implicit none
+  private
+  public          :: integ 
+  type(gaussian)  :: g1, g2
+  real            ::  pi = 4.0d0*datan(1.0d0)
+
+  type integ
+      real(8) :: int_val
+  contains 
+      procedure, public :: S_int
+      procedure, public :: T_int
+      procedure, public :: Ven_int
+      procedure, public :: Vee_int
+  end type integ 
+contains !A problem, I had junk in kinetic function, looks to happen for coulomb too
+  subroutine S_int(this, g1, g2)
+     ! Evaluates the overlap between two contracted Gaussiansi
+     class(integ),    intent(inout) :: this !This is polymorphic
+     class(gaussian), intent(inout) :: g1, g2
+       integer                      :: ia, ib
+       real(8)                      :: overlap, s_val
+       s_val = 0.0d0       
+       do ia = 1, g1%nb
+          do ib = 1, g2%nb
+             s_val = s_val + g1%norm(ia) * g2%norm(ib) * g1%coef(ia) * g2%coef(ib) * &
+                     overlap( g1%exps(ia), g1%shell, g1%origin, g2%exps(ib), g2%shell, g2%origin) 
+          end do
+       end do
+       this%int_val = s_val
+  end subroutine
+  subroutine T_int(this, g1, g2)
+    ! Evaluates the kinetic energy between two contracted Gaussians
+     class(integ),    intent(inout) :: this
+     class(gaussian), intent(inout) :: g1, g2
+       integer                      :: ia, ib
+       real(8)                      :: kinetic, kin_val
+       kin_val = 0.0d0 
+       do ia = 1, g1%nb
+          do ib = 1, g2%nb
+             kin_val = kin_val + g1%norm(ia) * g2%norm(ib) * g1%coef(ia) * g2%coef(ib) * &
+                       kinetic( g1%exps(ia), g1%shell, g1%origin, g2%exps(ib), g2%shell, g2%origin)
+             !write(*,*) 'kin_val :',kin_val
+          end do
+       end do
+       this%int_val = kin_val
+  end subroutine
+  subroutine Ven_int(this, g1, g2, C) 
+     !This function evaluates the coulomb potential integral within electron-nucleus
+     !a  : contracted Gaussian a (Basis function object) 
+     !b  : contracted Gaussian b (Basis function object) 
+     !C  : center of nucleus
+     class(integ),    intent(inout) :: this
+     class(gaussian), intent(inout) :: g1, g2
+       real(8),       intent(inout) :: C(3)
+       real(8)                      :: V_col, nuc_attraction
+       integer                      :: ia, ib
+       V_col = 0.0d0
+       do ia = 1, g1%nb 
+          do ib = 1, g2%nb 
+             V_col = V_col + g1%norm(ia) * g2%norm(ib) * g1%coef(ia) * g2%coef(ib) * &
+                     nuc_attraction( g1%exps(ia), g1%shell, g1%origin, g2%exps(ib),  g2%shell, g2%origin, C)
+          end do
+       end do
+       this%int_val = V_col
+  end subroutine
+  subroutine Vee_int(this, a, lmn1, RA, b, lmn2, RB, c, lmn3, RC, d, lmn4, RD)
+     !This function evaluates the coulomb potential integral within electron-electron (repulsion)
+     !a, b, c, d  :  are the respective gaussian exponents of gaussians A, B, C and D
+     !lmni        :  are the respective respective angular momentum for gaussians A, B, C and D (e.g. i=1 <=> a%shell =(0,0,0))
+     !RA, RB, RC, RD : are the respective gaussian center or each gaussian A, B, C and D
+     class(integ),    intent(inout) :: this
+       real(8),       intent(inout) :: a, b, c, d, RA(3), RB(3), RC(3), RD(3)
+       integer,       intent(inout) :: lmn1(3), lmn2(3), lmn3(3), lmn4(3)
+       real(8)                      :: RP1(3), RP2(3), RP1P2(3), p1, p2, alp, &
+                                       RAB(3), RCD(3), pi, RP1P2norm, val, E, R
+       integer                      :: t, u, v, tau, nu, phi, l(4), m(4), n(4)
+       pi = 4.0d0*datan(1.0d0)
+       l(1) = lmn1(1)
+       l(2) = lmn2(1)
+       l(3) = lmn3(1)
+       l(4) = lmn4(1)
+       m(1) = lmn1(2)
+       m(2) = lmn2(2)
+       m(3) = lmn3(2)
+       m(4) = lmn4(2)
+       n(1) = lmn1(3)
+       n(2) = lmn2(3)
+       n(3) = lmn3(3)
+       n(4) = lmn4(3)
+       p1 = a + b ! composite exponent of gaussians A and B
+       p2 = c + d ! composite exponent of gaussians C and D
+       RP1   = (a*RA + b*RB)/p1 ! composite center of gaussians A and B                  
+       RP2   = (c*RC + d*RD)/p2 ! composite center of gaussians A and B                  
+       RP1P2 = RP1 - RP2
+       RP1P2norm = norm2(RP1 - RP2)
+       alp = p1*p2/( p1 + p2 )        
+       RAB = RA - RB
+       RCD = RC - RD
+ 
+       val = 0.0d0
+       do t = 0, ( l(1) + l(2) + 1 )
+          do u = 0, ( m(1) + m(2) + 1 ) 
+             do v = 0, ( n(1) + n(2) +1 )
+                do tau = 0, ( l(3) + l(4) +1 )
+                   do nu = 0, ( m(3) + m(4) +1 )
+                      do phi = 0, ( n(3) + n(4) +1 )
+                         val = val + E(l(1),l(2),t,RAB(1),a,b) * &
+                                     E(m(1),m(2),u,RAB(2),a,b) * &
+                                     E(n(1),n(2),v,RAB(3),a,b) * &
+                                     E(l(3),l(4),tau,RCD(1),c,d) * &
+                                     E(m(3),m(4),nu ,RCD(2),c,d) * &
+                                     E(n(3),n(4),phi,RCD(3),c,d) * &
+                                     (-1)**(tau+nu+phi)* &
+                                     R(t+tau,u+nu,v+phi,0,alp,RP1P2)
+                      end do
+                   end do
+                end do
+             end do
+          end do
+       end do
+       this%int_val = val*2.0d0*pi**2.5d0/(p1*p2*(p1+p2)**0.5d0)
+  end subroutine
+end module integral
+!***********************************************************************************
+
+!******************************************************************
+recursive function fact2(n) result(n2)
+   !this function calculates n!!
+   implicit none
+   integer, intent(in)  :: n
+   integer              :: n2
+   if ( ( n .LE. 1 ) .and. (n .GE. -1) ) then 
+       n2 = 1 
+   else if ( n .LT. -1 ) then
+       n2 = 0 
+   else
+       n2 = n*fact2(n-2)
+   end if
+end function
+
+!******************************************************************
+recursive function E(i, j, t, Qx, a, b) result(res)
+   !This function calculates the recursive value of Hermite Gaussian coefficients
+   !a   => exponent of Gaussian A
+   !b   => exponent of Gaussian B
+   !i,j => orbital angular momentum of Gaussian A and gassian B, e.g. XA^i *XB^j
+   !t   => number of nodes in Hermite, this depends on the kind of integral e.g. overlap t=0, dipole moment t=1
+   !Qx  => distance within Gaussian centers (XA-XB)
+   implicit none
+   integer             :: i, j, t
+   real(8), intent(in) :: a, b, Qx
+   real(8)             :: p, q, res 
+   p = a + b
+   q = a*b/p
+   if ( (t < 0) .OR. (t > (i+j) ) ) then
+      res = 0.0d0
+   else if ( (i .EQ. 0) .AND. (j .EQ. 0 ) .AND. (t .EQ. 0) ) then
+      res = exp(-q*Qx**2)
+   else if ( j .EQ. 0 ) then
+      !Go down through i
+      res = E(i-1, j, t-1, Qx, a, b)/(2*p) - q*Qx/a*E(i-1, j, t, Qx, a, b) + (t+1)*E(i-1, j, t+1, Qx, a, b)
+   else
+      res = E(i, j-1, t-1, Qx, a, b)/(2*p) + q*Qx/b*E(i, j-1, t, Qx, a, b) + (t+1)*E(i, j-1, t+1, Qx, a, b)
+   end if
+end function
+
+!*********************************************************************
+function  overlap(a,lmn1, RA, b, lmn2, RB) result(ovl)
+   !Evaluates the overlap integral between gaussians A and B
+   !a    => Gaussian exponent of A
+   !b    => Gaussian exponent of B
+   !RA   => center of Gaussian A
+   !RB   => center of Gaussian B
+   !lmn1 => orbital angular momentum (e.g. (1,0,0) -> (l,m,n) for Gaussian A
+   !lmn2 => orbital angular momentum for Gaussian B
+   implicit none
+   real(8), intent(in) :: a, RA(3), b, RB(3)
+   integer, intent(in) :: lmn1(3), lmn2(3)
+   integer             :: l1, l2, m1, m2, n1, n2 
+   real(8)             :: Sx, Sy, Sz, Q(3), pi, p, E, ovl
+   pi = 4.0d0*datan(1.0d0)
+   l1 = lmn1(1)
+   l2 = lmn2(1)
+   m1 = lmn1(2)
+   m2 = lmn2(2)
+   n1 = lmn1(3)
+   n2 = lmn2(3)
+   p  = a + b
+   Q  = RA - RB
+   Sx = E(l1, l2, 0, Q(1), a, b)
+   Sy = E(m1, m2, 0, Q(2), a, b)
+   Sz = E(n1, n2, 0, Q(3), a, b)
+   ovl= Sx*Sy*Sz*(pi/p)**1.5d0
+end function
+!***********************************************************************
+function kinetic(a, lmn1, RA, b, lmn2, RB) result(kin)
+   !Evaluates the kinetic energy integral between gaussians A and B
+   !a    => Gaussian exponent of A
+   !b    => Gaussian exponent of B
+   !RA   => center of Gaussian A
+   !RB   => center of Gaussian B
+   !lmn1 => orbital angular momentum (e.g. (1,0,0) -> (l,m,n) for Gaussian A
+   !lmn2 => orbital angular momentum for Gaussian B
+   implicit none
+   real(8), intent(in) :: a, RA(3), b, RB(3)
+   integer, intent(in) :: lmn1(3), lmn2(3)
+   integer             :: l1, l2, m1, m2, n1, n2, lmn1_tmp(3), lmn2_tmp(3)
+   real(8)             :: overlap , Tab0, Tab1, Tab2, kin,tmp
+   l1 = lmn1(1)
+   l2 = lmn2(1)
+   m1 = lmn1(2)
+   m2 = lmn2(2)
+   n1 = lmn1(3)
+   n2 = lmn2(3)
+   lmn1_tmp = lmn1
+   lmn2_tmp = lmn2
+   ! Tab = -0.5 ( Dij^2*Skl*Smn + Sij*Dkl^2*Smn + Sij*Skl*Dmn^2)
+   ! Dij^2 =j(j-1) *S(i,j-2) - 2b*(2j+1)* S(i,j) + 4b^2*S(i,j+2) 
+
+   ! Tab0 definition (j*(j-1)*S(i,j-2))
+   lmn2_tmp(1) = l2-2
+   Tab0 =  l2*(l2-1.0d0)*overlap(a, lmn1_tmp, RA, b,lmn2_tmp, RB)     
+   lmn2_tmp(1) = lmn2(1)
+   lmn2_tmp(2) = m2-2
+   Tab0 = Tab0+ m2*(m2-1.0d0)*overlap(a, lmn1_tmp, RA, b, lmn2_tmp, RB)     
+   lmn2_tmp(2) = lmn2(2)
+   lmn2_tmp(3) = n2-2
+   Tab0 = Tab0+ n2*(n2-1.0d0)*overlap(a, lmn1_tmp, RA, b, lmn2_tmp, RB)     
+   lmn2_tmp(3) = lmn2(3)
+   Tab0 = -0.5d0*Tab0
+   !write(*,*) '*************************'
+   !write(*,*) 
+   !write(*,*) 'Tab0 :', Tab0
+
+
+   ! Tab1 definition of 2b*(2j+1)* S(i,j)
+   !write(*,*)'overlap before :', overlap(a, lmn1_tmp, RA, b,lmn2_tmp, RB)
+   tmp = overlap(a, lmn1_tmp, RA, b,lmn2_tmp, RB)
+   !write(*,*)'overlap before :', tmp
+   Tab1 = tmp ! I had to do this because Tab1 store junk...
+   !Tab1 = overlap(a, lmn1_tmp, RB, b, lmn2_tmp, RB)
+   !write(*,*) 'Tab1 :', Tab1
+   Tab1 = b*(2.0d0*(l2+m2+n2)+3.0d0)*Tab1
+   Tab1 = b*(2.0d0*(l2+m2+n2)+3.0d0)*overlap(a, lmn1_tmp, RA, b,lmn2_tmp, RB)
+   !write(*,*) 'Tab1 :', Tab1
+
+   ! Tab2 definition of 4b^2*S(i,j+2)
+   lmn2_tmp(1) = l2+2
+   Tab2 =  overlap(a, lmn1_tmp, RA, b,lmn2_tmp, RB)     
+   lmn2_tmp(1) = lmn2(1)
+   lmn2_tmp(2) = m2+2
+   Tab2 = Tab2+ overlap(a, lmn1_tmp, RA, b,lmn2_tmp, RB)*1.0d0     
+   lmn2_tmp(2) = lmn2(2)
+   lmn2_tmp(3) = n2+2
+   Tab2 = Tab2+ overlap(a, lmn1_tmp, RA, b,lmn2_tmp, RB)*1.0d0     
+   lmn2_tmp(3) = lmn2(3)
+   Tab2 = -2.0d0*b**2.0d0*Tab2 
+   !write(*,*) 'Tab2 :', Tab2
+
+   kin = Tab0 + Tab1 + Tab2
+   !write(*,*) 'kin :',kin
+end function 
+
+
+!******************************************************************************************
+recursive function R(t, u, v, n, p, RPC) result(val) 
+   !This function computes the auxiliary  Hermite Coulomb integral function R^n_{tuv}(p,RP,RC)
+   !by a revursive expression
+   !t,u,v:  are order of the Coulomb Hermite derivative in x,y,z
+   !n    :  order of Boys function 
+   !RPC  :  vector distance between P and C        
+   !F_n(Tb)
+   implicit none
+   integer, intent(in)  :: t, u, v, n   
+   real(8), intent(in)  :: RPC(3), p 
+   real(8)              :: val, Tb, boys1, RPCnorm
+   
+   RPCnorm = norm2(RPC(:))
+   Tb = p*RPCnorm**2.0d0 !Tb = p*RPC^2  (or dot product)
+   val = 0.0d0
+   if ( (t .EQ. 0) .AND. (u .EQ. 0) .AND. (v .EQ. 0) ) then
+      val = val + (-2.0d0*p)**n*boys1(n,Tb) !R^n_{000}=(-2p)^n*F_n(p*Rpc^2)
+   else if ( (t .EQ. 0) .AND. (u .EQ. 0) ) then
+        if ( v .GT. 1 ) val = val + (v-1.0d0)*R(t, u, v-2, n+1, p, RPC)
+        val = val + RPC(3)*R(t, u, v-1, n+1, p, RPC)
+   else if ( t .EQ. 0 ) then
+        if ( u .GT. 1 ) val = val + (u-1.0d0)*R(t, u-2, v, n+1, p, RPC) 
+        val = val + RPC(2)*R(t, u-1, v, n+1, p, RPC)
+   else 
+        if ( t .GT. 1 ) val = val + (t-1.0d0)*R(t-2, u, v, n+1, p, RPC)
+        val = val + RPC(1)*R(t-1, u, v, n+1, p, RPC)
+   end if
+end function 
+
+!*********************************************************************************
+recursive function boys1(n,T) result(boys_val)
+   !This function calculates the boys function integral for Coulomb
+   !n  : Boys' function index
+   !T  : Boys' function variable
+   implicit none
+   integer, intent(in) :: n
+   real(8), intent(in) :: T
+   real(8)             :: boys_val, pi
+   
+   pi =4.0d0*atan(1.0d0)
+
+   if ( (T .GT. 1e-8) .AND. (n .EQ. 0) ) then
+      boys_val = ( pi/(4.0d0*T) )**0.5d0*derf( T**0.5d0 )
+   else if ( T .LE. 1e-8) then
+      !First two terms of Taylor expansion to avoid division over zero
+      boys_val = 1.0d0/(2.0d0* n + 1.0d0) - T/( 2.0d0*n + 3.0d0) 
+   else 
+      boys_val = ( ( 2.0d0*n - 1.0d0 )*boys1(n-1,T) - exp(-T) )/ (2.0d0*T)
+   end if
+
+end function
+
+!*******************************************************************************
+
+function nuc_attraction(a, lmn1, RA, b, lmn2, RB, RC) result(val)
+   !This function evaluates the nuclear attraction within two Gaussians
+   !a    :  exponent of Gaussian A
+   !b    :  exponent of Gaussian B
+   !lmn1 :  integer vector(3) with the angular momentum of Ax^l Ay^m Az^n
+   !lmn2 :  integer vector(3) with the angular momentum 
+   !RA   :  origin of Gaussian A
+   !RB   :  origin of Gaussian B
+   !C    :  origin of nuclear center C 
+   implicit none
+   integer, intent(in)   :: lmn1(3), lmn2(3)
+   real(8), intent(in)   :: a, b, RA(3), RB(3), RC(3)
+   integer               :: l1, l2, m1, m2, n1, n2, t, u, v
+   real(8)               :: p, RP(3), RPC(3), RAB(3),  val, R, E, pi
+   pi = 4.0d0*datan(1.0d0)
+   l1 = lmn1(1)
+   l2 = lmn2(1)
+   m1 = lmn1(2)
+   m2 = lmn2(2)
+   n1 = lmn1(3)
+   n2 = lmn2(3)
+   p  = a + b 
+   RP  = (a*RA + b*RB)/p !Gaussian product center
+   RPC = RP - RC
+   RAB = RA - RB
+   val = 0.0d0
+   do t = 0, (l1 + l2 + 1) 
+      do u = 0, (m1 + m2 +1)
+         do v = 0, (n1 + n2 +1)
+            val = val + E(l1, l2, t, RAB(1), a, b) * &
+                        E(m1, m2, u, RAB(2), a, b) * &
+                        E(n1, n2, v, RAB(3), a, b) * &
+                        R(t, u, v, 0, p, RPC)
+         end do
+      end do 
+   end do
+   val = val*2*pi/p
+end function 
+
+
+
+
+

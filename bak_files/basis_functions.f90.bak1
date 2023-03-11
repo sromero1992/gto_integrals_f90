@@ -1,0 +1,181 @@
+module class_basis_function
+  implicit none
+  private
+  public  :: gaussian !, normalize
+  real    :: pi = 3.1415926535897931d0 ! Class-wide private constant
+!  integer :: fact2 
+
+  type gaussian
+      !real(8), allocatable :: coef,exps
+      real(8), pointer :: coef(:) => null()
+      real(8), pointer :: exps(:) => null()
+      real(8), pointer :: norm(:) => null()
+      real(8) :: origin(3)
+      integer :: shell(3), nb, nbas !nb => number of bare gaussians
+                                    !nbas >= nb   nbas = n_sf + 3*n_pf + 6*n_df  (number of basis functions {S P F} )
+  contains 
+      procedure, public :: print_gaussian_info 
+      procedure, public :: allocation
+      procedure, public :: normalization
+      !procedure, public :: S
+      !procedure, public :: read_gaussian
+  end type gaussian 
+contains
+  subroutine print_gaussian_info(this)
+     class(gaussian), intent(inout) :: this
+       write(*,*) '###########################################' 
+       write(*,*) 'Atomic coordinates: ',this%origin(:)   
+       write(*,*) 'Number of basis: ',this%nb   
+       write(*,*) 'Gaussian exponents: ',this%exps(:)  
+       write(*,*) 'Gaussian coefficients: ',this%coef(:)   
+       write(*,*) 'Normalization: ',this%norm   
+       write(*,*) 'Electronic shell: ',this%shell(:)  
+       write(*,*) '###########################################' 
+  end subroutine
+  subroutine allocation(this)
+     class(gaussian), intent(inout) :: this
+       allocate(this%exps(this%nb))
+       allocate(this%coef(this%nb))
+       allocate(this%norm(this%nb))
+       !write(*,*)  'Size of exponents pointer array: ',size(this%exps)
+  end subroutine
+!  subroutine read_gaussian(this)
+!     class(gaussian), intent(inout) :: this
+
+!  end subroutine
+!  subroutine S(this1, this2, s_val)
+!     ! Evaluates the overlap between two contracted Gaussians
+!     class(gaussian), intent(in) :: this1, this2
+!       integer                :: ia, ib
+!       real(8)                ::  overlap
+!       real(8), intent(out)   :: s_val
+!
+!       s_val = 0.0d0       
+!       do ia = 1, this1%nbas
+!          do ib = 1, this2%nbas
+!             s_val = s_val + this1%norm(ia) * this2%norm(ib) * this1%coef(ia) * this2%coef(ib) * &
+!                     overlap( this1%exps(ia), this1%shell, this1%origin, this2%exps(ib), this2%shell, this2%origin) 
+!          end do
+!       end do
+!  end subroutine
+
+  subroutine normalization(this)  
+     class(gaussian), intent(inout) :: this
+       integer :: l, m, n, ll, fact2, nb, ia, ib
+       real(8) :: p1, Nor, p ! p1 prefactor
+       l = this%shell(1)
+       m = this%shell(2)
+       n = this%shell(3)
+       ll= l + m + n
+       !this%norm is an array of equal lenght to the number of primitive gaussians
+       !it is normalized first the primivitve bare gaussian functions 
+       this%norm = (2**(2*ll+1.5d0) * this%exps**(ll+1.5d0) / (fact2(2*l-1) * fact2(2*m-1) * fact2(2*n-1) *pi**1.5d0 )  )**0.5d0
+       p1 = pi**1.5d0 * fact2( 2*l-1 ) * fact2( 2*m-1 )*fact2( 2*n-1 )/2**ll
+
+       Nor = 0.0d0
+       nb = this%nb
+       do ia = 1, nb
+          do ib = 1, nb
+                p = this%exps(ia) + this%exps(ib)
+                Nor = Nor + this%norm(ia) * this%norm(ib) * this%coef(ia) * this%coef(ib) / p**1.5d0
+          end do
+       end do
+       Nor = Nor * p1
+       Nor = Nor**(-0.5d0)
+      do ia = 1, nb
+            this%coef(ia) = this%coef(ia) * Nor 
+      end do
+  end subroutine
+end module class_basis_function
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+recursive function fact2(n) result(n2)
+   !this function calculates n!!
+   integer, intent(in)  :: n
+   integer              :: n2
+   if ( ( n .LE. 1 ) .and. (n .GE. -1) ) then 
+       n2 = 1 
+   else if ( n .LT. -1 ) then
+       n2 = 0 
+   else
+       n2 = n*fact2(n-2)
+   end if
+end function
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+recursive function E(i, j, t, Qx, a, b) result(res)
+   !This function calculates the recursive value of Hermite Gaussian coefficients
+   !a   => exponent of Gaussian A
+   !b   => exponent of Gaussian B
+   !i,j => orbital angular momentum of Gaussian A and gassian B, e.g. XA^i *XB^j
+   !t   => number of nodes in Hermite, this depends on the kind of integral e.g. overlap t=0, dipole moment t=1
+   !Qx  => distance within Gaussian centers (XA-XB)
+   implicit none
+   integer             :: i, j, t
+   real(8), intent(in) :: a, b, Qx
+   real(8)             :: p, q, res 
+   p = a + b
+   q = a*b/p
+   if ( t < 0 ) then
+      res = 0.0d0
+   else if ( (i .EQ. 0) .AND. (j .EQ. 0 ) .AND. (t .EQ. 0) ) then
+      res = exp(-q*Qx**2)
+   else if ( j .EQ. 0 ) then
+      !Go down through i
+      res = E(i-1, j, t-1, Qx, a, b)/(2*p) - q*Qx/a*E(i-1, j, t, Qx, a, b) + (t+1)*E(i-1, j, t+1, Qx, a, b)
+   else
+      res = E(i, j-1, t-1, Qx, a, b)/(2*p) + q*Qx/b*E(i, j-1, t, Qx, a, b) + (t+1)*E(i, j-1, t+1, Qx, a, b)
+   end if
+end function
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+function  overlap(a,lmn1, RA, b, lmn2, RB) result(ovl)
+   !Evaluates the overlap integral between gaussians A and B
+   !a    => Gaussian exponent of A
+   !b    => Gaussian exponent of B
+   !RA   => center of Gaussian A
+   !RB   => center of Gaussian B
+   !lmn1 => orbital angular momentum (e.g. (1,0,0) -> (l,m,n) for Gaussian A
+   !lmn2 => orbital angular momentum for Gaussian B
+   implicit none
+   real(8), intent(in) :: a, RA(3), b, RB(3)
+   integer, intent(in) :: lmn1(3), lmn2(3)
+   integer             :: l1, l2, m1, m2, n1, n2 
+   real(8)             :: Sx, Sy, Sz, Q(3), pi, p, E, ovl
+   !real(8), intent(out):: ovl
+   pi = 4.0d0*datan(1.0d0)
+   l1 = lmn1(1)
+   l2 = lmn2(1)
+   m1 = lmn1(2)
+   m2 = lmn2(2)
+   n1 = lmn1(3)
+   n2 = lmn2(3)
+   p  = a + b
+   Q  = RA - RB
+
+   Sx = E(l1, l2, 0, Q(1), a, b)
+   Sy = E(m1, m2, 0, Q(2), a, b)
+   Sz = E(n1, n2, 0, Q(3), a, b)
+   ovl= Sx*Sy*Sz*(pi/p)**1.5d0
+end function
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!  subroutine S(this1, this2, s_val)
+!     ! Evaluates the overlap between two contracted Gaussians
+!     class(gaussian), intent(in) :: this1, this2
+!       integer                :: ia, ib
+!       real(8)                ::  overlap
+!       real(8), intent(out)   :: s_val
+!
+!       s_val = 0.0d0       
+!       do ia = 1, this1%nbas
+!          do ib = 1, this2%nbas
+!             s_val = s_val + this1%norm(ia) * this2%norm(ib) * this1%coef(ia) * this2%coef(ib) * &
+!                     overlap( this1%exps(ia), this1%shell, this1%origin, this2%exps(ib), this2%shell, this2%origin) 
+!          end do
+!       end do
+!  end subroutine
+
+
