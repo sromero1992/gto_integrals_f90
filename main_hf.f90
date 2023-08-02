@@ -36,6 +36,7 @@ program basis_test
   !call basis_moments
   call okven_matbuild
 
+  !stop
   allocate(S_TMP(nbas,nbas))
   !call diagon_fortran(1,.TRUE.,S_TMP) 
   call diagon(1,.FALSE.,S_TMP) 

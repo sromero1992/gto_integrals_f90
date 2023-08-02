@@ -11,7 +11,8 @@ endif
 
 ifeq ($(DEBUG),Y)
   # Debug flags
-  FFLAGS = -O3 -fbacktrace -fbounds-check -Wall -std=f2008 -fall-intrinsics -g -ffpe-trap=zero,overflow,underflow  #-funroll-loops 
+  #FFLAGS = -O3 -fbacktrace -fbounds-check -Wall -std=f2008 -fall-intrinsics -g -ffpe-trap=zero,overflow,underflow  #-funroll-loops 
+  FFLAGS = -O0 -fbacktrace -fbounds-check -Wall -std=f2008 -fall-intrinsics -g -ffpe-trap=zero,overflow,underflow  #-funroll-loops 
 else
   # Production flags
   FFLAGS = -O3 -fbacktrace 
