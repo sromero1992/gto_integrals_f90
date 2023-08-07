@@ -1,5 +1,5 @@
 subroutine get_energy(ener)
-  use com_vars
+  use module_com
   implicit none
   real(8), intent(inout)      :: ener
   real(8)                     :: ener2,trace, H_tmp(nbas, nbas), DH_MAT(nbas,nbas)

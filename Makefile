@@ -25,8 +25,9 @@ endif
 	$(F90) $(FFLAGS)  -c  $< 
 
 # Object modules
-modules = basis_functions.o modules.o
-mainp   = diagon.o diagon_fortran.o  dens.o sort_eivec_val.o quick_sort.o read_info.o  okven_matbuild.o coul_build.o s_transform.o get_energy.o nuc_rep.o hf_scf.o basis_moments.o  getRmoment.o degsym.o  main_hf.o
+modules = modules_diag.o modules_com.o basis_functions.o modules_g.o
+#mainp   = diagon.o diagon_fortran.o  dens.o sort_eivec_val.o quick_sort.o read_info.o  okven_matbuild.o coul_build.o s_transform.o get_energy.o nuc_rep.o hf_scf.o basis_moments.o  getRmoment.o degsym.o  main_hf.o
+mainp   = diagon.o dens.o sort_eivec_val.o quick_sort.o read_info.o  okven_matbuild.o coul_build.o s_transform.o get_energy.o nuc_rep.o hf_scf.o basis_moments.o  getRmoment.o degsym.o  main_hf.o
 obj = $(modules) $(mainp)
 
 bin = hf_scf.exe

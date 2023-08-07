@@ -1,7 +1,8 @@
 program basis_test
   use class_basis_function
   use integral
-  use com_vars
+  use module_com
+  use module_g
   use mat_build
   use diag
   implicit none
@@ -13,7 +14,7 @@ program basis_test
 
   del          = 1.0d-7
   e_tol        = 1.0d-6
-  chk_nrlmol   = .FALSE.
+  chk_nrlmol   = .TRUE.
   debug        = .FALSE.
   ext_bas      = .FALSE.
   f_bol        = .FALSE. ! Activate F functions
@@ -36,12 +37,12 @@ program basis_test
   !call basis_moments
   call okven_matbuild
 
-  !stop
-  allocate(S_TMP(nbas,nbas))
+  stop
+  !allocate(S_TMP(nbas,nbas))
   !call diagon_fortran(1,.TRUE.,S_TMP) 
-  call diagon(1,.FALSE.,S_TMP) 
+  !call diagon(1,.FALSE.,S_TMP) 
 
-  call hf_scf(ener_final)
+  !call hf_scf(ener_final)
   !write(*,*) 'FINAL ENERGY : ', ener_final
 
 end program 

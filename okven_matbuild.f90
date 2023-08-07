@@ -1,7 +1,8 @@
 subroutine okven_matbuild
   use class_basis_function
   use integral
-  use com_vars
+  use module_com
+  use module_g
   use mat_build
   implicit none
   type(gaussian)             :: ga, gb    ! Declare gaussian basis 
@@ -33,9 +34,11 @@ subroutine okven_matbuild
      do isa = 1, site_type(isite) 
         N_SPDF(:,isa)     = (/ g(isa)%sf, g(isa)%pf, g(isa)%df, g(isa)%ff /) 
         N_SPDF_SUM(:,isa) = (/ 0, N_SPDF(1,isa),  sum(N_SPDF(1:2,isa)), sum(N_SPDF(1:3,isa)), sum(N_SPDF(1:4,isa))/)
+        !This is identifying the spdf multiplicity later
         do li = 1, l_max
-           do lli = 1, N_SPDF(li,isa) 
-               idx(isa, li, lli) = idx_tmp 
+           do ifunc = 1, N_SPDF(li,isa) 
+               !index depending on site, angular quantum number and number of functions of that angular 
+               idx(isa, li, ifunc) = idx_tmp
                idx_tmp = idx_tmp + SPDF(li) 
            end do
         end do
@@ -50,41 +53,37 @@ subroutine okven_matbuild
   T_MAT   = 0.0d0
   Ven_MAT = 0.0d0
 
-  do isite = 1, nsite
-     do isa = 1, site_type(isite)
+  do isite = 1, nsite !type sites i
+     do isa = 1, site_type(isite) !site a
         
         ga = g(isa)
-        do jsite = 1, nsite
-           do isb = 1, site_type(jsite)
+        do jsite = 1, nsite !types site j
+           do isb = 1, site_type(jsite) !site b
 
               gb = g(isb) 
-              do li = 1, l_max
+              do li = 1, l_max !angular momentum i
 
-                 ii = N_SPDF_SUM(li,isa)
-                 do lj =1, l_max
+                 do lj =1, l_max ! angular momentum j
 
-                    jj = N_SPDF_SUM(lj,isb)
-                    do lli = 1, N_SPDF(li,isa)
-                       do llj = 1, N_SPDF(lj,isb) 
-                          do iSPDF = 1, SPDF(li) 
+                    do ifunc = 1, N_SPDF(li,isa) ! number of bare SPDF functions
 
-                             iloc = idx(isa,li,lli)  + iSPDF
-                             ga%shell = shells(li, iSPDF, :) 
-                             do jSPDF = 1, SPDF(lj)
+                       iloc = idx(isa,li,ifunc) 
+                       do jfunc = 1, N_SPDF(lj,isb)
 
-                                jloc = idx(isb,lj,llj)  + jSPDF
-                                gb%shell = shells(lj, jSPDF, :)
+                          jloc = idx(isb,lj,jfunc) 
+                          write(*,*) 'iloc+1, last,  jloc+1, last : ', iloc+1, iloc+SPDF(li), jloc+1, jloc+SPDF(lj)
+                                !call S%S_int( ga, gb, li, lj, iloc , jloc,SPDF(li),SPDF(lj),S_mat(iloc:iloc+SPDF(li),jloc:jloc+SPDF(lj) ))      
+                                call S%S_int( ga, gb, li, lj, ifunc , jfunc, SPDF(li), SPDF(lj))      
+                                S_MAT( iloc+1:iloc+SPDF(li), jloc+1:jloc+SPDF(lj) ) = S%MAT(1:SPDF(li),1:SPDF(lj))
 
-                                call S%S_int( ga, gb, ii + lli , jj + llj )      
-                                call T%T_int( ga, gb, ii + lli , jj + llj )      
-                                S_MAT( iloc, jloc)    = S_MAT( iloc, jloc )   + S%int_val
-                                T_MAT( iloc, jloc)    = T_MAT( iloc, jloc )   + T%int_val
-                                do i = 1, all_atms
-                                   call Ven%Ven_int( ga, gb, ii + lli , jj + llj ,g(i)%origin)      
-                                   Ven_MAT( iloc, jloc)  = Ven_MAT( iloc, jloc ) + 1.0d0*g(isa)%qn*Ven%int_val
-                                end do
-                             end do
-                          end do
+                                !call S%S_int( ga, gb, ii + ifunc , jj + jfunc )      
+                                !call T%T_int( ga, gb, ii + ifunc , jj + jfunc )      
+                                !S_MAT( iloc, jloc)    = S_MAT( iloc, jloc )   + S%int_val
+                                !T_MAT( iloc, jloc)    = T_MAT( iloc, jloc )   + T%int_val
+                                !do i = 1, all_atms
+                                !   call Ven%Ven_int( ga, gb, ii + ifunc , jj + jfunc ,g(i)%origin)      
+                                !   Ven_MAT( iloc, jloc)  = Ven_MAT( iloc, jloc ) + 1.0d0*g(isa)%qn*Ven%int_val
+                                !end do
                        end do
                     end do
                  end do
@@ -168,27 +167,28 @@ subroutine okven_matbuild
 
      !Check against ovlbaby which elements do we have
      open(15,file='ovl_ovlbaby2.txt') 
-     l=0
-     m=0
-      do j = 1, nrec   
-         if (ovlbaby(j) .NE. 0.0d0 ) then
-            l = l+1
-            do i = 1, nbas*(nbas + 1)/2 
-               if ( (ovlbaby(j) .NE. 0.0d0) .AND. ( S_VEC(i) .NE. 0.0d0) ) then
-                  if (  abs( ovlbaby(j) - S_VEC(i) ) .LE.  del  ) then
-     
-                     write(15,*) ovlbaby(j), j, S_VEC(i), i ,'     X'
-                     !write(*,*) ovlbaby(j), j, S_VEC(i), i
-                     ovlbaby(j) = -1000.0d0
-                     S_VEC(i)   = 1000.0d0
-                     m = m+1
-                     exit 
-                  else if ( (ovlbaby(j) .NE. -1000.0d0) .AND. (S_VEC(i) .NE. 1000.0d0)) then 
-                     write(15,*) ovlbaby(j), j, S_VEC(i), i 
-                  end if
-               end if
-            end do
-         end if
+     !l=0
+     !m=0
+     do j = 1, nrec   
+        write(15,*) j, S_Vec(j)-ovlbaby(j)
+     !    if (ovlbaby(j) .NE. 0.0d0 ) then
+     !       l = l+1
+     !       do i = 1, nbas*(nbas + 1)/2 
+     !          !if ( (ovlbaby(j) .NE. -1.0d0) .AND. ( S_VEC(i) .NE. 0.0d0) ) then
+     !          if ( S_VEC(i) .NE. 0.0d0)  then
+     !             if (  abs( ovlbaby(j) - S_VEC(i) ) .LE.  del  ) then
+     !                write(15,*) ovlbaby(j), j, S_VEC(i), i ,'     X'
+     !                !write(*,*) ovlbaby(j), j, S_VEC(i), i
+     !                ovlbaby(j) = -1000.0d0
+     !                S_VEC(i)   = 1000.0d0
+     !                m = m+1
+     !                exit 
+     !             else if ( (ovlbaby(j) .NE. -1000.0d0) .AND. (S_VEC(i) .NE. 1000.0d0)) then 
+     !                write(15,*) ovlbaby(j), j, S_VEC(i), i 
+     !             end if
+     !          end if
+     !       end do
+     !    end if
      end do    
      close(15)
      write(*,*) 'OVLBABY total elements :',nrec

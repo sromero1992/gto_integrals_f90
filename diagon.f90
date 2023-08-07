@@ -2,7 +2,7 @@ subroutine  diagon(mode,verbose,D_TMP)
   !mode 1 calculates density for S_MAT
   !mode 2 calculates density for matrix D_TMP 
   !mode 3 calculates rotation for molecular orbitals F' 
-  use com_vars
+  use module_com
   use diag 
   implicit none
   real(8),intent(inout) :: D_TMP(nbas,nbas)

@@ -1,7 +1,7 @@
 subroutine  dens(mode, verbose, E_VEC, D_TMP) 
 !mode = 1 stores density in D_MAT
 !mode = 2 stores density in D_TMP
-  use com_vars
+  use module_com
   use diag 
   implicit none
   real(8),intent(inout) :: D_TMP(nbas,nbas), E_VEC(nbas,nbas)

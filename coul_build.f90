@@ -2,7 +2,8 @@ subroutine coul_build
    use class_basis_function
    use integral
    use mat_build
-   use com_vars 
+   use module_com 
+   use module_g
    type(gaussian)         :: ga, gb, gc, gd     ! Declare gaussian basis 
    type(integ)            :: Vee ! Declaration of integral variables that uses g objects
    real(8), allocatable   :: Gab(:,:)

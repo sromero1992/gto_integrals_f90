@@ -1,5 +1,5 @@
 subroutine s_transform(mode,verbose,X)
-  use com_vars, only       : nbas, eig, eigV, eig_tmp, eigV_tmp, X_MAT
+  use module_com, only       : nbas, eig, eigV, eig_tmp, eigV_tmp, X_MAT
   real(8), intent(inout)  :: X(nbas,nbas)
   integer                 :: i, j, k, mode
   logical                 :: verbose

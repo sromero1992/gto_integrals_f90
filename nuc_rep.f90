@@ -1,7 +1,8 @@
 subroutine  nuc_rep(ener_nuc)
   use class_basis_function
   use mat_build
-  use com_vars 
+  use module_com
+  use module_g
   implicit none
   real(8), intent(inout) :: ener_nuc 
   real(8)                :: d

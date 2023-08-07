@@ -1,7 +1,8 @@
 subroutine hf_scf(ener_fin)
    !use class_basis_function
    !use integral
-   use com_vars
+   use module_com
+   use module_g
    use mat_build
    use diag
    real(8), intent(inout)  :: ener_fin

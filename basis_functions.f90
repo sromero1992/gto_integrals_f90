@@ -11,8 +11,17 @@ module class_basis_function
       real(8), pointer :: exps(:)   => null()
       real(8), pointer :: norm(:)   => null()
       real(8) :: origin(3)
-      integer :: shell(3), nb, nbas, n_atm, qe, qn !nb => number of bare gaussians
-      integer :: sf , pf, df, ff, sf_sup, pf_sup, df_sup, ff_sup !nbas >= nb   nbas = n_sf + 3*n_pf + 6*n_df  (number of basis functions {S P D F} )
+      integer :: nbg,nbg_sup      !nbg   => number of bare gaussians
+      integer :: nfunc,nfunc_sup  !nfunc => number of basis functions
+      integer :: qe, qn           !q? number of electrons and protos
+      integer :: n_atm            !atomic number
+      integer :: shell(3)         !shell for angular momentum numbers 
+      integer :: nbas             !nbas  => n_sf + 3 n_pf + 6 n_df   (number of basis SPDF functions) 
+      integer :: sf , pf, df, ff  !basis functions for S,P,D and F 
+      integer :: sf_sup, pf_sup, df_sup, ff_sup !basis functions for supplemental S,P,D and F
+      !store all basis function values here for easy access  
+      integer :: func(4)       
+      integer :: func_sup(4) 
   contains 
       procedure, public :: print_gaussian_info 
       procedure, public :: allocation
@@ -23,28 +32,28 @@ contains
 
   subroutine print_gaussian_info(this)
      class(gaussian), intent(inout) :: this
-       integer                      :: ibas
+             integer                      :: ifunc
        write(*,*) '#########################################################################' 
-       write(*,*) 'Atomic number: ',this%n_atm 
-       write(*,*) 'Atomic coordinates: ',this%origin(:)   
-       write(*,*) 'Number of basis: ',this%nb   
-       write(*,*) 'Gaussian exponents: '
-       write(*,*)  this%exps(:)  
-       write(*,*) 'Gaussian coefficients: '
-       do ibas = 1, this%nbas 
-          write(*,*) this%coef(:,ibas)   
+       write(*,*) 'Atomic number            : ',this%n_atm 
+       write(*,*) 'Atomic coordinates       : ',this%origin(:)   
+       write(*,*) 'Number of basis functions: ',this%nbg   
+       write(*,*) 'Bare Gaussian exponents    : '
+       write(*,*)  this%exps(1:this%nbg)  
+       write(*,*) 'Bare Gaussian coefficients : '
+       do ifunc = 1, this%nfunc
+       write(*,*) this%coef(1:this%nbg,ifunc)   
        end do
        !write(*,*) 'Normalization: ',this%norm   
        write(*,*) 'Electronic shell: ',this%shell(:)  
        write(*,*) '#########################################################################' 
   end subroutine
   subroutine allocation(this)
-     !this%nb    => number of bare gaussians (exponents)
-     !this%nbas  => number of gaussian sets of s,p,d functions
+     !this%nbg    => number of bare gaussians (exponents)
+     !this%nfunc  => number of basis functions 
      class(gaussian), intent(inout) :: this
-       allocate(this%coef(this%nb,this%nbas))
-       allocate(this%exps(this%nb))
-       allocate(this%norm(this%nb))
+       allocate(this%coef(this%nbg,this%nfunc))
+       allocate(this%exps(this%nbg))
+       allocate(this%norm(this%nbg))
        this%shell(:) = 0
   end subroutine
   !subroutine normalization(this)  
@@ -93,7 +102,8 @@ module  integral
   !real(8)         :: pi = 4.0d0*datan(1.0d0)
 
   type integ
-      real(8) :: int_val
+      real(8)              :: int_val
+      real(8), allocatable :: Mat(:,:)
   contains 
       procedure, public :: S_int
       procedure, public :: T_int
@@ -102,29 +112,64 @@ module  integral
   end type integ 
 contains
 
-  subroutine S_int(this, g1, g2, i, j)
+  !subroutine S_int(this, g1, g2, i, j)
+  subroutine S_int(this, ga, gb, li, lj, ifunc, jfunc, max_iSPDF, max_jSPDF)
      ! Evaluates the overlap between two contracted Gaussians
-     class(integ),    intent(inout) :: this !This is polymorphic
-     class(gaussian), intent(inout) :: g1, g2
-       integer,       intent(in)    :: i, j
-       integer                      :: ia, ib 
-       real(8)                      :: overlap, s_val, cof(2)
+     use mat_build, only             : SPDF, N_SPDF, N_SPDF_SUM
+     use module_com,  only             : shells
 
-       s_val = 0.0d0       
-       do ia = 1, g1%nb
-          cof(1) = g1%coef(ia,i) 
-          if ( cof(1) .NE. 0.0d0  ) then
-             do ib = 1, g2%nb
-                cof(2) = g2%coef(ib,j)
-                if ( cof(2) .NE. 0.0d0  ) then
-                   !s_val = s_val + g1%norm(ia) * g2%norm(ib) * g1%coef(ia,i) * g2%coef(ib,j) * & 
-                   s_val = s_val + cof(1) * cof(2) * &
-                           overlap( g1%exps(ia), g1%shell, g1%origin, g2%exps(ib), g2%shell, g2%origin) 
-                end if 
-             end do
-          end if
+     class(integ),    intent(inout) :: this !This is polymorphic
+     class(gaussian), intent(inout) :: ga, gb
+       !integer,       intent(in)    :: i, j
+       integer,       intent(in)    :: li, lj, ifunc, jfunc, max_iSPDF, max_jSPDF
+       integer                      :: iSPDF, jSPDF, inbg, jnbg
+       real(8)                      :: overlap, s_val
+
+       !s_val = 0.0d0       
+       !do ia = 1, g1%nbg
+       !   cof(1) = g1%coef(ia,i) 
+       !   if ( cof(1) .NE. 0.0d0  ) then
+       !      do ib = 1, g2%nbg
+       !         cof(2) = g2%coef(ib,j)
+       !         if ( cof(2) .NE. 0.0d0  ) then
+       !            !s_val = s_val + g1%norm(ia) * g2%norm(ib) * g1%coef(ia,i) * g2%coef(ib,j) * & 
+       !            s_val = s_val + cof(1) * cof(2) * &
+       !                    overlap( g1%exps(ia), g1%shell, g1%origin, g2%exps(ib), g2%shell, g2%origin) 
+       !         end if 
+       !      end do
+       !   end if
+       !end do
+
+       if ( allocated(this%Mat) ) deallocate(this%Mat)
+       allocate(this%Mat(max_iSPDF,max_jSPDF) )
+       this%Mat(:,:) = 0.0d0
+
+       do iSPDF = 1, SPDF(li)
+
+          ga%shell = shells(li,iSPDF,:)
+
+          do jSPDF = 1, SPDF(lj)
+
+             gb%shell = shells(lj,jSPDF,:)
+
+             s_val = 0.0d0
+             do inbg = 1, ga%nbg
+
+                if ( ga%coef( inbg,ifunc)== 0) cycle
+
+                do jnbg = 1, gb%nbg
+
+                   if ( gb%coef( jnbg,jfunc) == 0) cycle
+             
+                   s_val =  s_val + ga%coef(inbg,ifunc) * gb%coef(jnbg,jfunc) * & 
+                          overlap( ga%exps(inbg), ga%shell, ga%origin, gb%exps(jnbg), gb%shell, gb%origin) 
+
+                end do
+             end do   
+             this%Mat(iSPDF,jSPDF) = s_val
+          end do
        end do
-       this%int_val = s_val
+
   end subroutine
 
   subroutine T_int(this, g1, g2, i, j)
@@ -136,10 +181,10 @@ contains
        real(8)                      :: kinetic, kin_val, cof(2)
 
        kin_val = 0.0d0 
-       do ia = 1, g1%nb
+       do ia = 1, g1%nbg
           cof(1) =  g1%coef(ia,i)
           if ( cof(1)  .NE. 0.0d0  ) then
-             do ib = 1, g2%nb
+             do ib = 1, g2%nbg
                 cof(2) = g2%coef(ib,j) 
                 if ( cof(2)  .NE. 0.0d0  ) then
                    !kin_val = kin_val + g1%norm(ia) * g2%norm(ib) * g1%coef(ia,i) * g2%coef(ib,j) * &
@@ -166,10 +211,10 @@ contains
        integer                      :: ia, ib 
 
        V_col = 0.0d0
-       do ia = 1, g1%nb
+       do ia = 1, g1%nbg
           cof(1) = g1%coef(ia,i)
           if (cof(1) .NE. 0.0d0) then 
-             do ib = 1, g2%nb
+             do ib = 1, g2%nbg
                 cof(2) = g2%coef(ib,j)
                 if (   cof(2)  .NE. 0.0d0  ) then
                    !V_col = V_col + g1%norm(ia) * g2%norm(ib) * g1%coef(ia,i) * g2%coef(ib,j) * &
@@ -198,16 +243,16 @@ contains
 
        tau = 1.0d-10      
        val = 0.0d0
-       do ia = 1, ga%nb
+       do ia = 1, ga%nbg
           c(1) =  ga%coef(ia,i) 
           if ( c(1) .NE. 0.0d0 ) then 
-             do ib = 1, gb%nb
+             do ib = 1, gb%nbg
                 c(2) = gb%coef(ib,j)
                 if ( c(2) .NE. 0.0d0 ) then 
-                   do ic = 1, gc%nb
+                   do ic = 1, gc%nbg
                       c(3) = gc%coef(ic,k)
                       if ( c(3) .NE. 0.0d0 ) then 
-                         do id = 1, gd%nb
+                         do id = 1, gd%nbg
                             c(4) = gd%coef(id,l)
                             if ( (   c(4)  .NE. 0.0d0 ) .AND. &
                                  ( ( ga%exps(ia) + gb%exps(ib) ) * ( gc%exps(ic) + gd%exps(id) ) .GT. tau )     ) then  

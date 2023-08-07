@@ -1,7 +1,8 @@
 subroutine basis_moments
   use class_basis_function
   use integral
-  use com_vars
+  use module_com
+  use module_g
   use mat_build
   implicit none
   integer                    :: lmax2, SPD(3), SPDsum(4), Nmom, rmm_ord, ii, jj, ispd, jspd
