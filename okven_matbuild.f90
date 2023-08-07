@@ -58,32 +58,31 @@ subroutine okven_matbuild
         
         ga = g(isa)
         do jsite = 1, nsite !types site j
-           do isb = 1, site_type(jsite) !site b
+           do isb = isa, site_type(jsite) !site b
 
               gb = g(isb) 
               do li = 1, l_max !angular momentum i
 
-                 do lj =1, l_max ! angular momentum j
+                 do lj =li, l_max ! angular momentum j
 
                     do ifunc = 1, N_SPDF(li,isa) ! number of bare SPDF functions
 
                        iloc = idx(isa,li,ifunc) 
-                       do jfunc = 1, N_SPDF(lj,isb)
+                       !do jfunc = 1, N_SPDF(lj,isb)
+                       do jfunc = ifunc, N_SPDF(lj,isb)
 
                           jloc = idx(isb,lj,jfunc) 
-                          write(*,*) 'iloc+1, last,  jloc+1, last : ', iloc+1, iloc+SPDF(li), jloc+1, jloc+SPDF(lj)
-                                !call S%S_int( ga, gb, li, lj, iloc , jloc,SPDF(li),SPDF(lj),S_mat(iloc:iloc+SPDF(li),jloc:jloc+SPDF(lj) ))      
-                                call S%S_int( ga, gb, li, lj, ifunc , jfunc, SPDF(li), SPDF(lj))      
-                                S_MAT( iloc+1:iloc+SPDF(li), jloc+1:jloc+SPDF(lj) ) = S%MAT(1:SPDF(li),1:SPDF(lj))
+                          !write(*,*) 'iloc+1, last,  jloc+1, last : ', iloc+1, iloc+SPDF(li), jloc+1, jloc+SPDF(lj)
+                          call S%S_int( ga, gb, li, lj, ifunc , jfunc, SPDF(li), SPDF(lj))      
+                          S_MAT( iloc+1:iloc+SPDF(li), jloc+1:jloc+SPDF(lj) ) = S%MAT(1:SPDF(li),1:SPDF(lj))
+                          S_MAT( jloc+1:jloc+SPDF(lj), iloc+1:iloc+SPDF(li) ) = transpose( S%MAT(1:SPDF(li),1:SPDF(lj)) )
+                          !call T%T_int( ga, gb, ii + ifunc , jj + jfunc )     
+                          !T_MAT(iloc+1:iloc+SPDF(li),jloc+1:jloc+SPDF(lj)) = T%MAT(1:SPDF(li),1:SPDF(lj) 
 
-                                !call S%S_int( ga, gb, ii + ifunc , jj + jfunc )      
-                                !call T%T_int( ga, gb, ii + ifunc , jj + jfunc )      
-                                !S_MAT( iloc, jloc)    = S_MAT( iloc, jloc )   + S%int_val
-                                !T_MAT( iloc, jloc)    = T_MAT( iloc, jloc )   + T%int_val
-                                !do i = 1, all_atms
-                                !   call Ven%Ven_int( ga, gb, ii + ifunc , jj + jfunc ,g(i)%origin)      
-                                !   Ven_MAT( iloc, jloc)  = Ven_MAT( iloc, jloc ) + 1.0d0*g(isa)%qn*Ven%int_val
-                                !end do
+                          !do i = 1, all_atms
+                          !   call Ven%Ven_int( ga, gb, ii + ifunc , jj + jfunc ,g(i)%origin)      
+                          !   Ven_MAT( iloc, jloc)  = Ven_MAT( iloc, jloc ) + 1.0d0*g(isa)%qn*Ven%int_val
+                          !end do
                        end do
                     end do
                  end do
@@ -170,25 +169,7 @@ subroutine okven_matbuild
      !l=0
      !m=0
      do j = 1, nrec   
-        write(15,*) j, S_Vec(j)-ovlbaby(j)
-     !    if (ovlbaby(j) .NE. 0.0d0 ) then
-     !       l = l+1
-     !       do i = 1, nbas*(nbas + 1)/2 
-     !          !if ( (ovlbaby(j) .NE. -1.0d0) .AND. ( S_VEC(i) .NE. 0.0d0) ) then
-     !          if ( S_VEC(i) .NE. 0.0d0)  then
-     !             if (  abs( ovlbaby(j) - S_VEC(i) ) .LE.  del  ) then
-     !                write(15,*) ovlbaby(j), j, S_VEC(i), i ,'     X'
-     !                !write(*,*) ovlbaby(j), j, S_VEC(i), i
-     !                ovlbaby(j) = -1000.0d0
-     !                S_VEC(i)   = 1000.0d0
-     !                m = m+1
-     !                exit 
-     !             else if ( (ovlbaby(j) .NE. -1000.0d0) .AND. (S_VEC(i) .NE. 1000.0d0)) then 
-     !                write(15,*) ovlbaby(j), j, S_VEC(i), i 
-     !             end if
-     !          end if
-     !       end do
-     !    end if
+        write(15,*) j, S_vec(j),ovlbaby(j), S_Vec(j)-ovlbaby(j)
      end do    
      close(15)
      write(*,*) 'OVLBABY total elements :',nrec

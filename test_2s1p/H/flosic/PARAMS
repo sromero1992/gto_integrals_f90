@@ -1,0 +1,36 @@
+# Parameters to be used during calculation
+# If error is returned, update parameter and rerun calculation
+# see PARAMS.std for more info
+
+&param_data
+MXSPN             =        2 ! 1 for spin unpolarized, 2 for spin polarized
+MAX_FUSET         =       20 ! Max. number of function sets
+MX_ANG            =        3 ! Max. angular momentum
+MX_CNT            =     1000 ! Max. number of equivalent atoms
+MXATMS            =     1000 ! set to MX_CNT
+NMUPMAX           =        7 ! Needed for LBFGS
+MAX_BARE          =       50 ! Max. number of bare gaussians per atom
+MAX_CON           =       15 ! Max. number of contracted functions per angular momentum
+MAX_OCC           =     2000 ! Max. number of occupied states
+MAXUNSYM          =       70 ! Max. total number of contracted orbitals for one atom
+MX_GRP            =        1 ! Max. number of group operations
+MAX_REP           =        1 ! Max. number of irreducible group representations
+MAXSLC            =      300 ! Max. number of salcs on a shell
+LOCMAX            =       36 ! Parameters depending on the current point group
+ISMAX             =       32
+MAXSYMSALC        =       32
+MXRPSP            =      100 ! Max. number of radial points for integration of nonlocal part of pseudopotential
+MXPTAB            =      100 ! Max. size of table for tabulated pseudopotentials
+MXLPSP            =        5 ! Highest angular momentum allowed for nonlocal part of pseudopotential
+MXKPT             =        1 ! Max. number of KPTS in FORMFAK
+MPBLOCK           =      100 ! Block size for general temporary storage
+MXPOISS           =      100 ! Block size in poisson1 and coupot
+NSPEED            =       25 ! Smaller block size to speed up density evaluation
+LDIM              =        3 ! Do not change this unless you know exactly what you are doing
+CUTEXP            =   40.000 ! Cutoff for exponentials (EXP(-CUTEXP) is virtually zero)
+MAX_VIRT_PER_SYM  =     2100 ! Max number of stored orbitals per representation
+MAXGFIT           =       15 ! Max. number of gaussians for starting potential fit
+MAXLSQF           =       50 ! Max. number of gaussians for general least-square fits
+MTEMP             =    50000 ! Temporary storage in overlap
+KRHOG             =       10 ! 1 for LDA calculations, 10 for GGA
+&end

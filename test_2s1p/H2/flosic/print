@@ -1,0 +1,329 @@
+DFTSW version 0.1
+This is DFTSW code - Density Functional Theory in SouthWest (El Paso). It evolved from the UTEP-NRLMOL code but all routines such as one electron integrals, overlap integrals, Coulomb integrals, HF integral, Fock matrix construction, Becke mesh etc. have been written from scratch for angular momentum upto h. It however maintains the code intializations and file names and outputs same as UTEP-NRLMOL for comptability reasons.The code development team is 
+ 
+Carlos Diaz, Luis Basurto, Yoh Yamamoto, Po-Hao Chang,  Selim Romero, Zachhary Buschmann,Tunna Baruah and Rajendra R. Zope.
+ 
+Some details of code and its parallelization can be found in the theses of Carlos Diaz,Zacchary Buschmann and Luis Basurto.
+ 
+Permission to use, copy, and distribute this software can only be
+granted by the authors. Please contact rzope@utep.edu
+for questions, updates, modifications, and bug reports.
+ 
+If you use this program please cite the following articles:
+ 
+* M. R. Pederson and K. A. Jackson, Phys. Rev. B. 41, 7453 (1990)
+* K. A. Jackson and M. R. Pederson, Phys. Rev. B. 42, 3276 (1990)
+* M. R. Pederson and K. A. Jackson, Phys. Rev. B. 43, 7312 (1991)
+* A. A. Quong, M. R. Pederson, and J. L. Feldman,  Solid State Commun. 87, 535 (1993)
+* D. V. Porezag and M. R. Pederson, Phys. Rev. B. 54, 7830 (1996)
+* A. Briley, M. R. Pederson, K. A. Jackson, D. C. Patton, and
+  D. V. Porezag, Phys. Rev. B. 58, 1786 (1998)
+* D. V. Porezag and M. R. Pederson, Phys. Rev. A. 60, 2840 (1999)
+ 
+SERIAL VERSION
+commit 7e93874e3f0646fb3bdd20aee53a5d549f9f9c8b
+Author: Selim Romero <100172731+sromero1992@users.noreply.github.com>
+ 
+GLOBAL AWAKENING ON:
+Mon Aug  7 00:58:22 MDT 2023
+CPU NODE:
+miles
+Linux miles 5.15.90.1-microsoft-standard-WSL2 #1 SMP Fri Jan 27 02:56:13 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+ 
+ LIST OF PARAMETERS USED FOR THIS ADVENTURE
+ MXSPN             =        2
+ MAX_FUSET         =       20
+ MX_ANG            =        3
+ MX_CNT            =     1000
+ MXATMS            =     1000
+ NMUPMAX           =        7
+ MAX_BARE          =       50
+ MAX_CON           =       15
+ MAX_OCC           =     2000
+ MAXUNSYM          =       70
+ MX_GRP            =        1
+ MAX_REP           =        1
+ MAXSLC            =      300
+ LOCMAX            =       36
+ ISMAX             =       32
+ MAXSYMSALC        =       32
+ MXRPSP            =      100
+ MXPTAB            =      100
+ MXLPSP            =        5
+ MXKPT             =        1
+ MPBLOCK           =      100
+ MXPOISS           =      100
+ NSPEED            =       25
+ LDIM              =        3
+ CUTEXP            =   40.000
+ MAX_VIRT_PER_SYM  =     2100
+ MAXGFIT           =       15
+ MAXLSQF           =       50
+ MTEMP             =    50000
+ KRHOG             =       10
+ See PARAMS file for parameter descriptions
+
+RELAXATION MODE: SCF-ONLY                           
+EXCHANGE    FUNCTIONAL: LDA
+CORRELATION FUNCTIONAL: LDA PERDEW-WANG 91           
+ 
+READING AND ANALYZING GROUP MATRICES
+DETERMINING SYMMETRY GROUP
+NUMBER OF REPRESENTATIONS:  1
+DIMENSIONS: 1
+ CHARACTERS OF SYMMETRY OPERATIONS IN GRPMAT:
+IRREP 1:  1.0
+CHECKING GREAT ORTHOGONALITY THEOREM
+CHECKING MULTIPLICATION TABLE
+REPRESENTATION  1 IS OK
+CHECKING GROUP REPRESENTATION
+GROUP REPRESENTATION IS OK
+CHECKING S REPRESENTATION
+S REPRESENTATION IS OK
+CHECKING P REPRESENTATION
+P REPRESENTATION IS OK
+CHECKING D REPRESENTATION:
+D REPRESENTATION IS OK
+TOTAL NUMBER OF FAILED TESTS:   0
+READING ATOMIC AND BASIS SET DATA
+ NOTE: To save memory, reduce MX_ANG in PARAMS file to           2
+SCF FOR ATOM TYPE   1 SUCCESSFUL, EIGENVALUES: 
+     -0.23318      0.61888
+      5.12500
+CHARGE ERROR IN DENSITY FIT:   0.00407002 (CORRECTED)
+POTENTIAL AND DENSITY FITS ARE OK
+Site Spec   1    1    POS:  0.0000   0.0000  -0.9990
+Site Spec   2    1    POS:  0.0000   0.0000   0.9990
+TESTING BASIS SET
+ 
+CREATING VARIATIONAL INTEGRATION MESH
+TIME FOR TEST INTEGRATION:                          0.050
+TIME FOR MESH READING / TESTING + WRITING:          0.050
+TIME FOR VMESH WALL CLOCK TOTAL:                    0.051
+TRYING TO READ THE VMOLD JUST GENERATED
+TOTAL NUMBER OF MESH POINTS:      18756
+NUMBER OF POINTS IN BUILD_HAM:      18756
+ DIAGGE3:Calling DSPGVD
+TIME FOR STARTUP:        0.070   wall clock:       0.114
+------------ FLOSIC-KLI --------------
+ 
+ITERATION     1
+=============
+CONSTRUCTING NEW WAVEFUNCTIONS
+SPIN 1:
+ Generating initial guess from atomic potential fit
+NUMBER OF POINTS IN BUILD_HAM:      18756
+NUMHAM:USING O(N)/PARALLEL HAMILTONIAN ROUTINE
+ 
+ IREP=           1 ISPN=           1
+ DIAGGE3:Calling DSPGVD
+ NVIRTTOT=           10
+STATE     1, EV=       -0.565536, OCCUP=     2.000000
+ ELECTRONS OF SPIN UP :    1.0000000000000000     
+ ELECTRONS OF SPIN DN :    1.0000000000000000     
+TRACE OF HAMILTONIAN:          -1.131071
+ 
+CALCULATING KOHN-SHAM POTENTIAL ON MESH POINTS
+NUMBER OF POINTS IN COUPOT:      18756
+TIME FOR COULOMB POTENTIAL          0.010
+LONG  CHARGE IN COUPOT:         2.000000
+TOTAL CHARGE IN COUPOT:         2.000000
+TIME FOR COUPOT1_BLOCKMESH:        0.010   wall clock:       0.016
+TOTAL CHARGE IN APOTNL:         1.999999706616
+DIPOLE MOMENT:  -0.220841920386D-06  -0.220841576981D-06   0.292055268858D-11
+TIME FOR COMPLETE APOTNL EXECUTION:                0.0700      0.0630
+ 
+================================================
+TOTAL ENERGY:                         -1.0854398
+CONTRIBUTIONS:
+NUCLEAR REPULSION:                     0.5005110
+LOCAL POTENTIAL:                      -3.0924935
+MEAN-FIELD COULOMB:                    1.1537680
+KINETIC+NONLOCAL POTENTIAL:            0.9482758
+EXCHANGE-CORRELATION:                 -0.5955010
+================================================
+ Energy convergence criteria : DFT
+TIME FOR ITERATION:        0.080   wall clock:       0.073
+ convergence :  F
+ 
+ITERATION     2
+=============
+CONSTRUCTING NEW WAVEFUNCTIONS
+SPIN 1:
+NUMHAM:USING O(N)/PARALLEL HAMILTONIAN ROUTINE
+NUMBER OF POINTS IN BUILD_HAM:      18756
+ 
+ IREP=           1 ISPN=           1
+ DIAGGE3:Calling DSPGVD
+ NVIRTTOT=           10
+STATE     1, EV=       -0.314219, OCCUP=     2.000000
+ ELECTRONS OF SPIN UP :    1.0000000000000000     
+ ELECTRONS OF SPIN DN :    1.0000000000000000     
+TRACE OF HAMILTONIAN:          -0.628438
+ 
+CALCULATING KOHN-SHAM POTENTIAL ON MESH POINTS
+NUMBER OF POINTS IN COUPOT:      18756
+TIME FOR COULOMB POTENTIAL          0.020
+LONG  CHARGE IN COUPOT:         2.000000
+TOTAL CHARGE IN COUPOT:         2.000000
+TIME FOR COUPOT1_BLOCKMESH:        0.020   wall clock:       0.015
+TOTAL CHARGE IN APOTNL:         1.999999839728
+DIPOLE MOMENT:  -0.146987685796D-06  -0.146987366041D-06  -0.368771679859D-11
+TIME FOR COMPLETE APOTNL EXECUTION:                0.0500      0.0500
+ 
+================================================
+TOTAL ENERGY:                         -1.0970019
+CONTRIBUTIONS:
+NUCLEAR REPULSION:                     0.5005110
+LOCAL POTENTIAL:                      -2.8898557
+MEAN-FIELD COULOMB:                    1.0540474
+KINETIC+NONLOCAL POTENTIAL:            0.7840507
+EXCHANGE-CORRELATION:                 -0.5457554
+================================================
+ Energy convergence criteria : DFT
+Potential convergence:0.11E-02   F
+BROYDEN MIXING OF POTENTIAL
+TIME FOR ITERATION:        0.060   wall clock:       0.057
+ convergence :  F
+ 
+ITERATION     3
+=============
+CONSTRUCTING NEW WAVEFUNCTIONS
+SPIN 1:
+NUMHAM:USING O(N)/PARALLEL HAMILTONIAN ROUTINE
+NUMBER OF POINTS IN BUILD_HAM:      18756
+ 
+ IREP=           1 ISPN=           1
+ DIAGGE3:Calling DSPGVD
+ NVIRTTOT=           10
+STATE     1, EV=       -0.320319, OCCUP=     2.000000
+ ELECTRONS OF SPIN UP :    1.0000000000000000     
+ ELECTRONS OF SPIN DN :    1.0000000000000000     
+TRACE OF HAMILTONIAN:          -0.640639
+ 
+CALCULATING KOHN-SHAM POTENTIAL ON MESH POINTS
+NUMBER OF POINTS IN COUPOT:      18756
+TIME FOR COULOMB POTENTIAL          0.020
+LONG  CHARGE IN COUPOT:         2.000000
+TOTAL CHARGE IN COUPOT:         2.000000
+TIME FOR COUPOT1_BLOCKMESH:        0.020   wall clock:       0.015
+TOTAL CHARGE IN APOTNL:         1.999999840790
+DIPOLE MOMENT:  -0.149333162942D-06  -0.149332828478D-06  -0.268796096492D-11
+TIME FOR COMPLETE APOTNL EXECUTION:                0.0600      0.0510
+ 
+================================================
+TOTAL ENERGY:                         -1.0971649
+CONTRIBUTIONS:
+NUCLEAR REPULSION:                     0.5005110
+LOCAL POTENTIAL:                      -2.8962160
+MEAN-FIELD COULOMB:                    1.0570139
+KINETIC+NONLOCAL POTENTIAL:            0.7887641
+EXCHANGE-CORRELATION:                 -0.5472379
+================================================
+ Energy convergence criteria : DFT
+Potential convergence:0.90E-03   F
+BROYDEN MIXING OF POTENTIAL
+TIME FOR ITERATION:        0.070   wall clock:       0.059
+ convergence :  F
+ 
+ITERATION     4
+=============
+CONSTRUCTING NEW WAVEFUNCTIONS
+SPIN 1:
+NUMHAM:USING O(N)/PARALLEL HAMILTONIAN ROUTINE
+NUMBER OF POINTS IN BUILD_HAM:      18756
+ 
+ IREP=           1 ISPN=           1
+ DIAGGE3:Calling DSPGVD
+ NVIRTTOT=           10
+STATE     1, EV=       -0.348125, OCCUP=     2.000000
+ ELECTRONS OF SPIN UP :    1.0000000000000000     
+ ELECTRONS OF SPIN DN :    1.0000000000000000     
+TRACE OF HAMILTONIAN:          -0.696251
+ 
+CALCULATING KOHN-SHAM POTENTIAL ON MESH POINTS
+NUMBER OF POINTS IN COUPOT:      18756
+TIME FOR COULOMB POTENTIAL          0.010
+LONG  CHARGE IN COUPOT:         2.000000
+TOTAL CHARGE IN COUPOT:         2.000000
+TIME FOR COUPOT1_BLOCKMESH:        0.010   wall clock:       0.015
+TOTAL CHARGE IN APOTNL:         1.999999841834
+DIPOLE MOMENT:  -0.159961944804D-06  -0.159961523360D-06   0.157518442734D-11
+TIME FOR COMPLETE APOTNL EXECUTION:                0.0600      0.0500
+ 
+================================================
+TOTAL ENERGY:                         -1.0974953
+CONTRIBUTIONS:
+NUCLEAR REPULSION:                     0.5005110
+LOCAL POTENTIAL:                      -2.9247406
+MEAN-FIELD COULOMB:                    1.0704447
+KINETIC+NONLOCAL POTENTIAL:            0.8102384
+EXCHANGE-CORRELATION:                 -0.5539488
+================================================
+ Energy convergence criteria : DFT
+Potential convergence:0.22E-05   F
+BROYDEN MIXING OF POTENTIAL
+TIME FOR ITERATION:        0.060   wall clock:       0.059
+ convergence :  F
+ 
+ITERATION     5
+=============
+CONSTRUCTING NEW WAVEFUNCTIONS
+SPIN 1:
+NUMHAM:USING O(N)/PARALLEL HAMILTONIAN ROUTINE
+NUMBER OF POINTS IN BUILD_HAM:      18756
+ 
+ IREP=           1 ISPN=           1
+ DIAGGE3:Calling DSPGVD
+ NVIRTTOT=           10
+STATE     1, EV=       -0.348162, OCCUP=     2.000000
+ ELECTRONS OF SPIN UP :    1.0000000000000000     
+ ELECTRONS OF SPIN DN :    1.0000000000000000     
+TRACE OF HAMILTONIAN:          -0.696324
+ 
+CALCULATING KOHN-SHAM POTENTIAL ON MESH POINTS
+NUMBER OF POINTS IN COUPOT:      18756
+TIME FOR COULOMB POTENTIAL          0.010
+LONG  CHARGE IN COUPOT:         2.000000
+TOTAL CHARGE IN COUPOT:         2.000000
+TIME FOR COUPOT1_BLOCKMESH:        0.010   wall clock:       0.016
+TOTAL CHARGE IN APOTNL:         1.999999841805
+DIPOLE MOMENT:  -0.159975933574D-06  -0.159975512058D-06   0.971556168849D-12
+TIME FOR COMPLETE APOTNL EXECUTION:                0.0600      0.0510
+ 
+================================================
+TOTAL ENERGY:                         -1.0974953
+CONTRIBUTIONS:
+NUCLEAR REPULSION:                     0.5005110
+LOCAL POTENTIAL:                      -2.9247708
+MEAN-FIELD COULOMB:                    1.0704592
+KINETIC+NONLOCAL POTENTIAL:            0.8102612
+EXCHANGE-CORRELATION:                 -0.5539559
+================================================
+ Energy convergence criteria : DFT
+ 
+SELF-CONSISTENCY REACHED, CALCULATING FORCES
+SCF-ONLY CALCULATION: SKIPPING FORCES
+TIME FOR ITERATION:        0.060   wall clock:       0.058
+ convergence :  T
+ ERROR read_embedding_input: no dft_embed_input found !!
+ emb mode            0
+ 
+SUMMARY OF ENERGY CONTRIBUTIONS:
+================================
+TOTAL ENERGY:                         -1.0974953
+NUCLEAR REPULSION:                     0.5005110
+LOCAL POTENTIAL:                      -2.9247708
+MEAN-FIELD COULOMB:                    1.0704592
+NONLOCAL POTENTIAL:                    0.0000000
+KINETIC:                               0.8102612
+LOCAL EXCHANGE:                       -0.4671577
+LOCAL CORRELATION:                    -0.0867983
+NONLOCAL EXCHANGE:                     0.0000000
+NONLOCAL CORRELATION:                  0.0000000
+EXTERNAL ELECTRIC FIELD:               0.0000000
+ 
+ find_ai1, find_ai_mode F n         
+ 
+HOPE TO SEE YOU AGAIN VERY SOON :-)
+TIME FOR EXECUTION OF THIS NEAT PROGRAM:            0.400   wall clock:       0.420

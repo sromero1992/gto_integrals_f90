@@ -112,7 +112,6 @@ module  integral
   end type integ 
 contains
 
-  !subroutine S_int(this, g1, g2, i, j)
   subroutine S_int(this, ga, gb, li, lj, ifunc, jfunc, max_iSPDF, max_jSPDF)
      ! Evaluates the overlap between two contracted Gaussians
      use mat_build, only             : SPDF, N_SPDF, N_SPDF_SUM
@@ -124,21 +123,6 @@ contains
        integer,       intent(in)    :: li, lj, ifunc, jfunc, max_iSPDF, max_jSPDF
        integer                      :: iSPDF, jSPDF, inbg, jnbg
        real(8)                      :: overlap, s_val
-
-       !s_val = 0.0d0       
-       !do ia = 1, g1%nbg
-       !   cof(1) = g1%coef(ia,i) 
-       !   if ( cof(1) .NE. 0.0d0  ) then
-       !      do ib = 1, g2%nbg
-       !         cof(2) = g2%coef(ib,j)
-       !         if ( cof(2) .NE. 0.0d0  ) then
-       !            !s_val = s_val + g1%norm(ia) * g2%norm(ib) * g1%coef(ia,i) * g2%coef(ib,j) * & 
-       !            s_val = s_val + cof(1) * cof(2) * &
-       !                    overlap( g1%exps(ia), g1%shell, g1%origin, g2%exps(ib), g2%shell, g2%origin) 
-       !         end if 
-       !      end do
-       !   end if
-       !end do
 
        if ( allocated(this%Mat) ) deallocate(this%Mat)
        allocate(this%Mat(max_iSPDF,max_jSPDF) )
@@ -292,7 +276,7 @@ recursive function fact2(n) result(n2)
 end function
 
 !******************************************************************
-recursive function E(i, j, t, Qx, a, b) result(res)
+pure recursive function E(i, j, t, Qx, a, b) result(res)
    !This function calculates the recursive value of Hermite Gaussian coefficients
    !a   => exponent of Gaussian A
    !b   => exponent of Gaussian B

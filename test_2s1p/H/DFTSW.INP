@@ -1,0 +1,87 @@
+# Full list of DFTSW.INP options printed in this file
+# Put Y,N or number next to the equal sign to determine execution
+# Don't forget the quotation marks for the letters
+# All variables in this list end with v
+
+#INPUT SECTION (at beginning)
+&input_data
+BASISV         = 'DEFAULT' ! Specify basis for calculation. Basis file should be in $DFTSW_BASIS directory
+CALCTYPEV      = 'SCF-ONLY'   ! SCF-ONLY, LBFGS, VERLET, or VIBRATIONAL geometry optimization
+STARTING_GUESSV = 'atomic_pot_fit' ! Sets initial guess potential. 
+                  !Starting guess options: 'atomic_pot_fit', 'ADSIC_fit', 'HF_fit', or 'HF_Slater_fit'
+MIX_GUESSV     = 'N' ! Set to Y to mix initial potential guess in first iteration
+COULOMBV       = 'Analytic' ! Poisson Solver options: 'Analytic' or 'Numerical'
+HFV            = 'N' ! Set to Y or HF to run Hartree-Fock or HFS to run HF-Slater
+DCEPV          = 'N' ! Set to Y to run Density Consistent Effective Potential calculation
+EXCITEDV       = 'N' ! Determines if this is an excited state calculation
+FIXMV          = 'Y' ! Fix spin moment
+FRAGMENTV      = 'N' ! Process CLUSTER in fragments
+NONSCFV        = 'N' ! Set to Y to do a non SCF calculation
+NONSCFFORCESV  = 'N' ! Set to Y to calculate forces in a non SCF calculation
+SPARSEV        = 'N' ! Use sparse representation
+SOLVENTV       = 'N' ! Set to Y to include solvent effect (SOLVENTS)
+SYMMETRYV      = 'N' ! Set to Y to detect symmetry
+GEOMETRYV      = 'DEFAULT' ! 'DEFAULT' to processes from CLUSTER file
+UNITSV         = 'BOHR' !'BOHR','ANGS'
+NET_CHARGEV    = 0.0 
+MOMENTV        = 0.0
+xctypev        = 'LDA'  ! 'LDA', 'GGA'
+xFUNCV         = 'PW91' ! 'PW91','PBE',etc
+CFUNCV         = 'PW91' ! 'PW91','PBE',etc
+/
+
+#MESH SECTION (at beginning)
+&mesh_data
+MESH_TYPEV     = 'Variational' ! Mesh types: Variational, Becke
+FINEMESHV      = 'N' ! Set to Y to use refined Variational mesh
+/
+
+#SCF SECTION (at start of every iteration)
+&scf_data
+SCFTOLV        = 1.0D-6 ! SCF tolerance
+MAXSCFV        = 100 ! Maximum SCF iterations
+MIXINGV        = 'P' ! (P)otential (H)amiltonian (D)ensity matrix mixing
+ATOMSPHV       = 'N'
+DIAG1V         =  1  ! diagonalization to use on regular arrays (diagge.f90)
+DIAG2V         =  1  ! diagonalization to use on packed arrays (diag_dspgv.f90)
+DIAG3V         =  0  ! diagonalization to use on parallel (sdiagge_m.f90)
+DMATV          = 'N' ! Use density matrix in potential section
+/
+
+#SIC SECTION (at beginning)
+&sic_data
+SCSICV         =  1   ! Sets SIC Self-Consistency: 0 for Slater-Average, 1 for KLI (SIC only)
+LOCALSICV      = 'N'  ! Set to Y for Local-SIC quasi-SCF correction
+SOSICV         = 'N'  ! Set to Y for SO-SIC calculation
+ORBITALV       = 'FLO' ! Orbital transformation.  FLO/GS/FB/PM/KS (SIC only)
+TWOSTEPV       = 'N'  ! Set to Y for Two-Step SIC convergence. (SIC only)
+FROZEN_DENSV   = 'N'  ! Set to Y for frozen density FOD optimization (SIC only)
+LOC_FLO_MOMV   = 'N'  ! Set to Y to localize FLO moment. (SIC only)
+NWFOUTV        = -1   ! Write WFOUT file for every N-th iteration. (SIC only)
+BLENDERV       = 'N'  ! Set to Y to use FOD blender mode. (SIC only)
+/
+
+#TDDFT SECTION (at beginning)
+&tddft_data
+TDDFTV         = 'N' ! Set to Y to run td-dft calculation
+DTV            = 0.14D0 ! length of td-dft time step in A.U. (1 A.U.=0.024188 fs)
+MAXOVERV       = 'N' ! Set to Y run maximum overlap method calculation
+/
+
+#POST_SCF SECTION (PROPERTIES) (at the end)
+&post_scf_data
+JNTDOSV        = 'N' ! This calculates joint density of states
+MATDIPOLEV     = 'N'
+MOLDENV        = 'N' ! Use molden and wfx driver
+NBOV           = 'N' ! Use NBO driver
+WFGRIDV        = 'N' ! Set to Y to write orbitals in cube format
+DOSOCCUV       = 'N' ! Controls whether to calculate density of states
+DFTD3V         = 'N' ! Set to Y to do include Grimmes DFT-D3 dispersion
+POPULATIONV    = 'N' ! Population analysis
+RHOGRIDV       = 'N' ! Set to Y to execute RHOGRID
+SPNORBV        = 'N' ! Run SPNORB
+SPIN_CONTMNV   = 'N' ! RUN spin_contamination
+FIND_AIV       = 'N' ! Set FOD guess. 'N', 'FB-cent', 'MaxDens' and 'PairDens'  
+ATCALCV        = '-1' ! list of functionals for @Calculations (-1 to bypass)
+/
+

@@ -1,0 +1,9 @@
+ ********* NEW TRY ************, SPIN:            1
+ REP:            1  DIM:            1  NUMBER OF BASES:           10
+           1          10
+  -0.3203194      0.1077876E-01  0.5269958      0.9381960       4.726713    
+    5.102050       5.102050       5.244381       5.244381       5.839596    
+ FERMI LEVEL:    7.1050761944424076E-003  TEMP:    1.0000000000000000E-004
+ SUMMARY OF EVALUES AND THEIR OCCUPANCIES:
+    1  REP:  1  DEG:  1  SPIN:  1  ENERGY:  -0.320319      OCC:    1.00000    
+    2  REP:  1  DEG:  1  SPIN:  1  ENERGY:   0.107788E-01  OCC:   0.111022E-15

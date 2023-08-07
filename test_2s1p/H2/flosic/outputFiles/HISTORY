@@ -1,0 +1,9 @@
+  1000 ****** N E W   D A T A   S E T ******
+  CONVERGENCE REACHED TOLERANCE:   9.9999999999999995E-007
+           0.00000000          -1.09749529           0.81026119 TR, EN, KN
+           2  NUMBER OF IDENTITY MEMBERS
+           1  NUMBER OF IDENTICAL ATOMS, POSITION:
+        0.000000        0.000000       -0.998979       1.000    1.000 R, ZELC, ZNUC
+           1  NUMBER OF IDENTICAL ATOMS, POSITION:
+        0.000000        0.000000        0.998979       1.000    1.000 R, ZELC, ZNUC
+ -1000 ****** E N D   D A T A   S E T ******

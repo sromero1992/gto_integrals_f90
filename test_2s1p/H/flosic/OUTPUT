@@ -1,0 +1,19 @@
+  
+  SUMMARY OF BASIS SET:
+  NUMBER OF CONTRACTED FUNCTION SETS:           1
+  
+  FUNCTION SET:           1
+ FS:  1 IP:   1 POSITION:       0.000000       0.000000       0.000000
+ CONTRACTED ORBITALS FOR ANGULAR TYPE s       :           2
+ CONTRACTED ORBITALS FOR ANGULAR TYPE p       :           1
+ CONTRACTED ORBITALS FOR ANGULAR TYPE d       :           0
+ GAUSSIANS FOR FUNCTION SET:
+    77.8       11.5       2.61      0.732      0.228      0.745E-01
+ CONTRACTED ORBITALS FOR ANGULAR MOMENTUM:           0
+   0.377E-01  0.704E-01  0.113      0.139      0.109      0.359E-01
+    0.00       0.00       0.00       1.00       0.00       0.00    
+ CONTRACTED ORBITALS FOR ANGULAR MOMENTUM:           1
+    0.00       0.00       1.00       0.00       0.00       0.00    
+ TOTAL NUMBER OF CONTRACTED ORBITALS:           5
+  
+ REPRESENTATION:           1  HAS:           5  BASES
