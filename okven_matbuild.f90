@@ -30,8 +30,9 @@ subroutine okven_matbuild
  
   idx     = 0
   idx_tmp = 0
-  do isite = 1, nsite 
-     do isa = 1, site_type(isite) 
+  !do isite = 1, nsite 
+     !do isa = 1, site_type(isite) 
+     do isa = 1, all_atms 
         N_SPDF(:,isa)     = (/ g(isa)%sf, g(isa)%pf, g(isa)%df, g(isa)%ff /) 
         N_SPDF_SUM(:,isa) = (/ 0, N_SPDF(1,isa),  sum(N_SPDF(1:2,isa)), sum(N_SPDF(1:3,isa)), sum(N_SPDF(1:4,isa))/)
         !This is identifying the spdf multiplicity later
@@ -43,7 +44,7 @@ subroutine okven_matbuild
            end do
         end do
      end do 
-  end do 
+  !end do 
  
  
   allocate(   S_MAT( nbas, nbas) )
@@ -52,14 +53,17 @@ subroutine okven_matbuild
   S_MAT   = 0.0d0
   T_MAT   = 0.0d0
   Ven_MAT = 0.0d0
-  do isite = 1, nsite !type sites i
-     do isa = 1, site_type(isite) !site a
+  !do isite = 1, nsite !type sites i
+     !do isa = 1, site_type(isite) !site a
+     do isa = 1, all_atms !site a
         
         ga = g(isa)
         atm_chg = 1.0d0*ga%qn
-        do jsite = 1, nsite !types site j
-           do isb = 1, site_type(jsite) !site b
+        !do jsite = 1, nsite !types site j
+           !do isb = 1, site_type(jsite) !site b
            !do isb = isa, site_type(jsite) !site b
+           do isb = 1, all_atms !site b
+           
 
               gb = g(isb) 
               do li = 1, l_max !angular momentum i
@@ -101,9 +105,9 @@ subroutine okven_matbuild
                  end do
               end do
            end do
-        end do
+        !end do
      end do
-  end do
+  !end do
 
   !Overlap matrix
   write(*,*) 

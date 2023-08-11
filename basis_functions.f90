@@ -247,13 +247,52 @@ contains
   end subroutine
 
 !459 function elec_repulsion( a, lmn1, RA, b, lmn2, RB, c, lmn3, RC, d, lmn4, RD) result(val)
-  subroutine Vee_int(this, ga, gb, gc, gd, i, j, k, l)
+  subroutine Vee_int(this, ga, gb, gc, gd, li, lj, lk, ll, ifunc, jfunc, kfunc, lfunc)
+  !subroutine Vee_int(this, ga, gb, gc, gd, i, j, k, l)
      !This subroutine evaluates the four center electron repulsion 
      !a is the contracted gaussian a (Basis function object)
      !b is the contracted gaussian b (Basis function object)
      !c is the contracted gaussian c (Basis function object)
      !d is the contracted gaussian d (Basis function object)
      !i,j,k,l are the index of basis set
+     use mat_build, only             : SPDF, N_SPDF, N_SPDF_SUM
+     use module_com,  only           : shells
+
+     class(integ),    intent(inout) :: this !This is polymorphic
+     class(gaussian), intent(inout) :: ga, gb
+       !integer,       intent(in)    :: i, j
+       integer,       intent(in)    :: li, lj, ifunc, jfunc
+       integer                      :: iSPDF, jSPDF, inbg, jnbg
+       real(8)                      :: overlap, s_val
+
+       do iSPDF = 1, SPDF(li)
+
+          ga%shell = shells(li,iSPDF,:)
+
+          do jSPDF = 1, SPDF(lj)
+
+             gb%shell = shells(lj,jSPDF,:)
+
+             s_val = 0.0d0
+             do inbg = 1, ga%nbg
+
+                if ( ga%coef( inbg,ifunc)== 0) cycle
+
+                do jnbg = 1, gb%nbg
+
+                   if ( gb%coef( jnbg,jfunc) == 0) cycle
+             
+                   s_val =  s_val + ga%coef(inbg,ifunc) * gb%coef(jnbg,jfunc) * & 
+                          overlap( ga%exps(inbg), ga%shell, ga%origin, gb%exps(jnbg), gb%shell, gb%origin) 
+
+                end do
+             end do   
+             this%Mat(iSPDF,jSPDF) = s_val
+          end do
+       end do
+
+
+
      class(integ),    intent(inout) :: this
      class(gaussian), intent(inout) :: ga, gb, gc, gd
        integer,       intent(in)    :: i, j, k, l

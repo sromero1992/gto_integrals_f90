@@ -32,42 +32,34 @@ subroutine coul_build
          gb = g(isb)
          do li = 1, l_max
 
-            ii = N_SPDF_SUM(li,isa)
             do lj = 1, l_max
-               
-                jj = N_SPDF_SUM(lj,isb)
+                
+               allocate( Vee%MAT( SPDF(li), SPDF(lj) ) ) 
+               do  ifunc = 1, N_SPDF(li,isa)
 
-                do  lli = 1, N_SPDF(li,isa)
-                   do llj = 1, N_SPDF(lj,isb)
-                      do iSPDF = 1, SPDF(li)
+                   iloc = idx(isa,li,ifunc)
+                   do jfunc = 1, N_SPDF(lj,isb)
 
-                         iloc = idx(isa,li,lli)  + iSPDF
-                         ga%shell = shells(li, iSPDF, :)
-                         do jSPDF = 1, SPDF(lj)
+                      jloc = idx(isb,lj,jfunc) 
 
-                           jloc = idx(isb,lj,llj)  + jSPDF
-                           gb%shell = shells(lj, jSPDF, :)
+                      !if (Gab(iloc,jloc) /= 0.0d0) cycle
 
-                           if (Gab(iloc,jloc) .EQ. 0.0d0) then
-
-                              call Vee%Vee_int( ga, gb, ga, gb, &
-                                            ii + lli, jj + llj, &
-                                            ii + lli, jj + llj  )
+                      call Vee%Vee_int( ga, gb, ga, gb, &
+                                            ii + ifunc, jj + jfunc, &
+                                            ii + ifunc, jj + jfunc  )
 
                               Gab(iloc,jloc) = dsqrt(Vee%int_val)
                               Gab(jloc,iloc) = dsqrt(Vee%int_val)
 
-                           end if
 
-                         end do !End iSPDF
 
-                     end do !End jSPDF
-                  end do !End llj
-               end do !End lli
+                  end do !End jfunc
+               end do !End ifunc
+               allocate( Vee%MAT( SPDF(li), SPDF(lj) ) ) 
 
             end do !End lj
          end do !End li
-  
+
       end do !End isb
    end do !End isa
 
@@ -91,16 +83,16 @@ subroutine coul_build
 
                 jj = N_SPDF_SUM(lj,isb)
 
-                do lli = 1, N_SPDF(li,isa)
-                   do llj = 1, N_SPDF(lj,isb)
+                do ifunc = 1, N_SPDF(li,isa)
+                   do jfunc = 1, N_SPDF(lj,isb)
                       do iSPDF = 1, SPDF(li)
 
-                         iloc = idx(isa,li,lli)  + iSPDF
+                         iloc = idx(isa,li,ifunc)  + iSPDF
                          ga%shell = shells(li, iSPDF, :)
 
                          do jSPDF = 1, SPDF(lj)
 
-                           jloc = idx(isb,lj,llj)  + jSPDF
+                           jloc = idx(isb,lj,jfunc)  + jSPDF
                            gb%shell = shells(lj, jSPDF, :)
 
                            do isc = 1, all_atms
@@ -119,23 +111,23 @@ subroutine coul_build
                                         
                                        jj2 = N_SPDF_SUM(lj2,isd)  
 
-                                       do lli2 = 1,  N_SPDF(li2,isc)
-                                          do llj2 = 1, N_SPDF(lj2,isd)
+                                       do ifunc2 = 1,  N_SPDF(li2,isc)
+                                          do jfunc2 = 1, N_SPDF(lj2,isd)
                                              do iSPDF2 = 1, SPDF(li2)
                                                 
-                                                iloc2    = idx(isc,li2,lli2)  + iSPDF2
+                                                iloc2    = idx(isc,li2,ifunc2)  + iSPDF2
                                                 gc%shell = shells(li2, iSPDF2, :)
 
                                                 do jSPDF2 = 1, SPDF(lj2)
 
-                                                   jloc2    = idx(isd,lj2,llj2)  + jSPDF2
+                                                   jloc2    = idx(isd,lj2,jfunc2)  + jSPDF2
                                                    gd%shell = shells(lj2, jSPDF2, :)
 
                                                    if ( ( G_MAT(iloc,jloc,iloc2,jloc2) .EQ. 0.0d0 ) .AND. &
                                                         ( Gab(iloc,jloc)*Gab(iloc2,jloc2) .GT. tau ) ) then
 
                                                       call Vee%Vee_int(    ga   ,    gb   ,     gc    ,     gd   ,&
-                                                                        ii + lli, jj + llj, ii2 + lli2, jj2 + llj2)   
+                                                                        ii + ifunc, jj + jfunc, ii2 + ifunc2, jj2 + jfunc2)   
 
                                                       
 
@@ -153,8 +145,8 @@ subroutine coul_build
 
                                                 end do ! jSPDF2 number of ang. momentum s =>1, p = > 3 (px,py,pz)
                                              end do    ! iSPDF2 number of ang. momentum s =>1, p = > 3 (px,py,pz)
-                                          end do       ! bare gaussians of llj2 (site bi, ang.mom lj2)
-                                       end do          ! bare gaussians of lli2 (site ai, ang.mom li2)
+                                          end do       ! bare gaussians of jfunc2 (site bi, ang.mom lj2)
+                                       end do          ! bare gaussians of ifunc2 (site ai, ang.mom li2)
 
                                     end do ! lj2 ang.mom for site di
                                  end do    ! li2 ang.mom for site ci
@@ -164,8 +156,8 @@ subroutine coul_build
 
                         end do ! jSPDF number of ang. momentum s =>1, p = > 3 (px,py,pz)
                      end do    ! iSPDF number of ang. momentum s =>1, p = > 3 (px,py,pz) 
-                  end do       ! bare gaussians of llj (site bi, ang.mom lj)
-               end do          ! bare gaussians of lli (site ai, ang.mom li)
+                  end do       ! bare gaussians of jfunc (site bi, ang.mom lj)
+               end do          ! bare gaussians of ifunc (site ai, ang.mom li)
 
             end do ! lj ang.mom for site bi
          end do    ! li  ang.mom for site ai
@@ -183,10 +175,10 @@ subroutine coul_build
             do lj =1, l_max
                do iSPDF = 1, N_SPDF(li,isa)
                   do jSPDF = 1, N_SPDF(lj,isb)
-                     do lli = 1, SPDF(li)
-                        do llj = 1, SPDF(lj)
-                           iloc = idx(isa,li,lli)  + iSPDF
-                           jloc = idx(isb,lj,llj)  + jSPDF
+                     do ifunc = 1, SPDF(li)
+                        do jfunc = 1, SPDF(lj)
+                           iloc = idx(isa,li,ifunc)  + iSPDF
+                           jloc = idx(isb,lj,jfunc)  + jSPDF
                            coul_val = 0.0d0
                            do isc = 1, all_atms
                               do isd = 1, all_atms
@@ -194,10 +186,10 @@ subroutine coul_build
                                     do lj2 =1, l_max
                                        do iSPDF2 = 1, N_SPDF(li2,isc)
                                           do jSPDF2 = 1, N_SPDF(lj2,isd)
-                                             do lli2 = 1, SPDF(li2)
-                                                do llj2 = 1, SPDF(lj2)
-                                                   iloc2 = idx(isc,li2,lli2)  + iSPDF2
-                                                   jloc2 = idx(isd,lj2,llj2)  + jSPDF2
+                                             do ifunc2 = 1, SPDF(li2)
+                                                do jfunc2 = 1, SPDF(lj2)
+                                                   iloc2 = idx(isc,li2,ifunc2)  + iSPDF2
+                                                   jloc2 = idx(isd,lj2,jfunc2)  + jSPDF2
  
                                                    !COUL_MAT(iloc,jloc) = COUL_MAT(iloc,jloc) + D_MAT(iloc2,jloc2)* &
                                                    !      ( 2.0d0*G_MAT(iloc,jloc,iloc2,jloc2) - G_MAT(iloc,iloc2,jloc,jloc2) )

@@ -4,7 +4,7 @@ module module_com
    real(8)                    :: temp_exps(3), el(2),  tmp1, tmp2, del, ener_final, e_tol, tau
    
    integer                    :: i, j, k, l, m, n2, ia, ib, ifunc, jfunc, nbas, nfunc, tot_natm_type, all_atms, & 
-                                 n_contracted_g, g_index, g_upper_bound, nrec, nelec, &
+                                 n_contracted_g, g_index, g_upper_bound, nrec, nelec, ifunc2, jfunc2, &
                                  shells(4,10,3), nsite, isite, jsite 
  
    integer, allocatable       :: qe(:), qn(:), n_atm(:), nbg_tmp(:), nfunc_tmp(:), site_type(:)
