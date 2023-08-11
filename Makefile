@@ -39,4 +39,4 @@ hf_scf : $(obj)
 	$(F90) $(FFLAGS) $(obj) -o  $(bin) $(LIBS) 
 
 clean: 
-	rm -f *.o *.mod *.txt
+	rm -f *.o *.mod *.txt hf_scf.exe

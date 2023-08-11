@@ -8,7 +8,7 @@ subroutine okven_matbuild
   type(gaussian)             :: ga, gb    ! Declare gaussian basis 
   type(integ)                :: S, T, Ven! Declaration of integral variables that uses g objects
   logical                    :: verbose
-  integer                    :: ii, jj 
+  real(8)                    :: atm_chg 
   verbose = .FALSE.
 
   if (f_bol) then 
@@ -52,39 +52,52 @@ subroutine okven_matbuild
   S_MAT   = 0.0d0
   T_MAT   = 0.0d0
   Ven_MAT = 0.0d0
-
   do isite = 1, nsite !type sites i
      do isa = 1, site_type(isite) !site a
         
         ga = g(isa)
+        atm_chg = 1.0d0*ga%qn
         do jsite = 1, nsite !types site j
-           do isb = isa, site_type(jsite) !site b
+           do isb = 1, site_type(jsite) !site b
+           !do isb = isa, site_type(jsite) !site b
 
               gb = g(isb) 
               do li = 1, l_max !angular momentum i
 
-                 do lj =li, l_max ! angular momentum j
+                 do lj = 1, l_max ! angular momentum j
+                 !do lj =li, l_max ! angular momentum j
+
+                    allocate( S%MAT( SPDF(li), SPDF(lj)) ) 
+                    allocate( T%MAT( SPDF(li), SPDF(lj)) ) 
+                    allocate( Ven%MAT( SPDF(li), SPDF(lj)) ) 
 
                     do ifunc = 1, N_SPDF(li,isa) ! number of bare SPDF functions
 
                        iloc = idx(isa,li,ifunc) 
-                       !do jfunc = 1, N_SPDF(lj,isb)
-                       do jfunc = ifunc, N_SPDF(lj,isb)
+                       do jfunc = 1, N_SPDF(lj,isb)
+                       !do jfunc = ifunc, N_SPDF(lj,isb)
 
-                          jloc = idx(isb,lj,jfunc) 
-                          !write(*,*) 'iloc+1, last,  jloc+1, last : ', iloc+1, iloc+SPDF(li), jloc+1, jloc+SPDF(lj)
-                          call S%S_int( ga, gb, li, lj, ifunc , jfunc, SPDF(li), SPDF(lj))      
+                          jloc = idx(isb,lj,jfunc)
+                          !----------------------------------------------------------------------------------------------
+                          !Those are integrating bare gaussians for provided function, and do it for all angular momentum 
+                          !----------------------------------------------------------------------------------------------
+                          call S%S_int( ga, gb, li, lj, ifunc , jfunc)      
                           S_MAT( iloc+1:iloc+SPDF(li), jloc+1:jloc+SPDF(lj) ) = S%MAT(1:SPDF(li),1:SPDF(lj))
-                          S_MAT( jloc+1:jloc+SPDF(lj), iloc+1:iloc+SPDF(li) ) = transpose( S%MAT(1:SPDF(li),1:SPDF(lj)) )
-                          !call T%T_int( ga, gb, ii + ifunc , jj + jfunc )     
-                          !T_MAT(iloc+1:iloc+SPDF(li),jloc+1:jloc+SPDF(lj)) = T%MAT(1:SPDF(li),1:SPDF(lj) 
+                          !S_MAT( jloc+1:jloc+SPDF(lj), iloc+1:iloc+SPDF(li) ) = transpose( S%MAT(1:SPDF(li),1:SPDF(lj)) )
+
+                          call T%T_int( ga, gb, li, lj, ifunc , jfunc)      
+                          T_MAT( iloc+1:iloc+SPDF(li), jloc+1:jloc+SPDF(lj) ) = T%MAT(1:SPDF(li),1:SPDF(lj))
+                          !T_MAT( jloc+1:jloc+SPDF(lj), iloc+1:iloc+SPDF(li) ) = transpose( T%MAT(1:SPDF(li),1:SPDF(lj)) )
 
                           !do i = 1, all_atms
-                          !   call Ven%Ven_int( ga, gb, ii + ifunc , jj + jfunc ,g(i)%origin)      
-                          !   Ven_MAT( iloc, jloc)  = Ven_MAT( iloc, jloc ) + 1.0d0*g(isa)%qn*Ven%int_val
+                             call Ven%Ven_int( ga, gb, li, lj, ifunc , jfunc, ga%origin, atm_chg)      
+                             Ven_MAT( iloc+1:iloc+SPDF(li), jloc+1:jloc+SPDF(lj) ) = Ven%MAT(1:SPDF(li),1:SPDF(lj)) !+ &
+                                                                               !Ven_MAT( iloc+1:iloc+SPDF(li), jloc+1:jloc+SPDF(lj) )                                                 
                           !end do
+                          !Ven_MAT( jloc+1:jloc+SPDF(lj), iloc+1:iloc+SPDF(li) ) = transpose(Ven_MAT( jloc+1:jloc+SPDF(lj),iloc+1:iloc+SPDF(li) )) 
                        end do
                     end do
+                    deallocate( S%MAT, T%MAT, Ven%MAT)
                  end do
               end do
            end do
@@ -166,8 +179,6 @@ subroutine okven_matbuild
 
      !Check against ovlbaby which elements do we have
      open(15,file='ovl_ovlbaby2.txt') 
-     !l=0
-     !m=0
      do j = 1, nrec   
         write(15,*) j, S_vec(j),ovlbaby(j), S_Vec(j)-ovlbaby(j)
      end do    
@@ -179,28 +190,9 @@ subroutine okven_matbuild
 
      !Check against hambaby which elements do we have
      open(15,file='T_hambaby2.txt') 
-     l=0
-     m=0
-      do j = 1, nrec   
-         if (hambaby(j) .NE. 0.0d0 ) then
-            l = l+1
-            do i = 1, nbas*(nbas + 1)/2 
-               if ( (hambaby(j) .NE. 0.0d0) .AND. ( T_VEC(i) .NE. 0.0d0) ) then
-                  if (  abs( hambaby(j) - T_VEC(i) ) .LE.  del  ) then
-     
-                     !write(*,*) hambaby(j), j, T_VEC(i), i
-                     write(15,*) hambaby(j), j, T_VEC(i), i ,'     X'
-                     hambaby(j) = -1000.0d0
-                     T_VEC(i)   = 1000.0d0
-                     m = m+1
-                     exit 
-                  else if ( (hambaby(j) .NE. -1000.0d0) .AND. (T_VEC(i) .NE. 1000.0d0)) then 
-                     write(15,*) hambaby(j), j, T_VEC(i), i 
-                  end if
-               end if
-            end do
-         end if
-     end do               
+     do j = 1, nrec   
+        write(15,*) j, T_vec(j),hambaby(j), T_Vec(j)-hambaby(j)
+     end do    
      close(15)
      write(*,*) 'HAMBABY total elements :',nrec
      write(*,*) 'HAMBABY non-zero elements :', l

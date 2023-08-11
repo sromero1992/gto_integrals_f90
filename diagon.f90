@@ -28,14 +28,15 @@ subroutine  diagon(mode,verbose,D_TMP)
      LWORk=-1
     
      write(*,*) 'SIZE OF S_MAT:',size(S_MAT)
-     CALL DSYEV( JOBZ, UPLO, NBAS, eigV, NBAS, eig, WORK, LWORK, INFO )
-     LWORK= INT(WORK(1))
+     call DSYEV( JOBZ, UPLO, NBAS, eigV, NBAS, eig, WORK, LWORK, INFO )
+     lwork= int(work(1))
      write(*,*)'WORK QUERY (LWORK)',LWORK
      deallocate(WORK)
      allocate(WORK(LWORK),STAT=ierr)
    
-     CALL DSYEV( JOBZ, UPLO, NBAS, eigV, NBAS, eig, WORK, LWORK, INFO )
-   
+     call DSYEV( JOBZ, UPLO, NBAS, eigV, NBAS, eig, WORK, LWORK, INFO )
+     deallocate(WORK)
+
      write(*,*)'INFO : ',info
      if (info .EQ. 0 ) then
        write(*,*)'DSYEV finished successfully'
@@ -60,7 +61,6 @@ subroutine  diagon(mode,verbose,D_TMP)
            write(*,*)
         end do 
      end if 
-     deallocate(work)
      write(*,*) 'END OF DIAG FOR S_MAT'
 
   else if ( mode .EQ. 2) then
@@ -77,6 +77,7 @@ subroutine  diagon(mode,verbose,D_TMP)
      allocate(WORK(LWORK),STAT=ierr)
    
      CALL DSYEV( JOBZ, UPLO, NBAS, eigV_tmp, NBAS, eig_tmp, WORK, LWORK, INFO )
+     deallocate(WORK)
    
      write(*,*)'INFO : ',info
      if (info .EQ. 0 ) then
@@ -101,7 +102,6 @@ subroutine  diagon(mode,verbose,D_TMP)
            write(*,*)eigV_tmp(i,:)
         end do 
      end if
-     deallocate(work)
      write(*,*) 'END OF DIAG  D_TMP' 
   
   else if (mode .EQ. 3) then

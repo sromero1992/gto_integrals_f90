@@ -112,21 +112,18 @@ module  integral
   end type integ 
 contains
 
-  subroutine S_int(this, ga, gb, li, lj, ifunc, jfunc, max_iSPDF, max_jSPDF)
+  subroutine S_int(this, ga, gb, li, lj, ifunc, jfunc)
      ! Evaluates the overlap between two contracted Gaussians
+     ! NOTE: this%MAT is allocated in okven_integral subroutine
      use mat_build, only             : SPDF, N_SPDF, N_SPDF_SUM
-     use module_com,  only             : shells
+     use module_com,  only           : shells
 
      class(integ),    intent(inout) :: this !This is polymorphic
      class(gaussian), intent(inout) :: ga, gb
        !integer,       intent(in)    :: i, j
-       integer,       intent(in)    :: li, lj, ifunc, jfunc, max_iSPDF, max_jSPDF
+       integer,       intent(in)    :: li, lj, ifunc, jfunc
        integer                      :: iSPDF, jSPDF, inbg, jnbg
        real(8)                      :: overlap, s_val
-
-       if ( allocated(this%Mat) ) deallocate(this%Mat)
-       allocate(this%Mat(max_iSPDF,max_jSPDF) )
-       this%Mat(:,:) = 0.0d0
 
        do iSPDF = 1, SPDF(li)
 
@@ -156,59 +153,97 @@ contains
 
   end subroutine
 
-  subroutine T_int(this, g1, g2, i, j)
+  !subroutine T_int(this, g1, g2, i, j)
+  subroutine T_int(this, ga, gb, li, lj, ifunc, jfunc)
     ! Evaluates the kinetic energy between two contracted Gaussians
-     class(integ),    intent(inout) :: this
-     class(gaussian), intent(inout) :: g1, g2
-       integer,       intent(in)    :: i, j
-       integer                      :: ia, ib !, i, j
-       real(8)                      :: kinetic, kin_val, cof(2)
+     use mat_build, only             : SPDF, N_SPDF, N_SPDF_SUM
+     use module_com,  only           : shells
 
-       kin_val = 0.0d0 
-       do ia = 1, g1%nbg
-          cof(1) =  g1%coef(ia,i)
-          if ( cof(1)  .NE. 0.0d0  ) then
-             do ib = 1, g2%nbg
-                cof(2) = g2%coef(ib,j) 
-                if ( cof(2)  .NE. 0.0d0  ) then
-                   !kin_val = kin_val + g1%norm(ia) * g2%norm(ib) * g1%coef(ia,i) * g2%coef(ib,j) * &
-                   kin_val = kin_val + cof(1) * cof(2) * &
-                             kinetic( g1%exps(ia), g1%shell, g1%origin, g2%exps(ib), g2%shell, g2%origin)
-                end if
-             end do
-          end if
+
+     class(integ),    intent(inout) :: this
+     class(gaussian), intent(inout) :: ga, gb
+       integer,       intent(in)    :: li, lj, ifunc, jfunc
+       integer                      :: iSPDF, jSPDF, inbg, jnbg
+       real(8)                      :: kinetic, kin_val
+
+
+       do iSPDF = 1, SPDF(li)
+
+          ga%shell = shells(li,iSPDF,:)
+
+          do jSPDF = 1, SPDF(lj)
+
+             gb%shell = shells(lj,jSPDF,:)
+
+             kin_val = 0.0d0
+             do inbg = 1, ga%nbg
+
+                if ( ga%coef( inbg,ifunc)== 0) cycle
+
+                do jnbg = 1, gb%nbg
+
+                   if ( gb%coef( jnbg,jfunc) == 0) cycle
+             
+                   kin_val = kin_val +  ga%coef(inbg,ifunc) * gb%coef(jnbg,jfunc) * & 
+                          kinetic( ga%exps(inbg), ga%shell, ga%origin, gb%exps(jnbg), gb%shell, gb%origin)
+ 
+
+                end do
+             end do   
+             this%Mat(iSPDF,jSPDF) = kin_val
+          end do
        end do
-       this%int_val = kin_val
+
   end subroutine
 
-  subroutine Ven_int(this, g1, g2, i, j, C) 
+  !subroutine Ven_int(this, g1, g2, i, j, C) 
+  subroutine Ven_int(this, ga, gb, li, lj, ifunc, jfunc, C, Zn)
      !This subroutine evaluates the coulomb potential integral within electron-nucleus
      !a  : contracted Gaussian a (Basis function object) 
      !b  : contracted Gaussian b (Basis function object) 
-     !C  : center of nucleus
-     !Self-note, still needs to be multiplied by Z_n
-     class(integ),    intent(inout) :: this
-     class(gaussian), intent(inout) :: g1, g2
-       real(8),       intent(in)    :: C(3)
-       real(8)                      :: V_col, nuc_attraction, cof(2)
-       integer,       intent(in)    :: i, j
-       integer                      :: ia, ib 
+     !C  : nuclei center
+     use mat_build, only             : SPDF, N_SPDF, N_SPDF_SUM
+     use module_com,  only           : shells
 
-       V_col = 0.0d0
-       do ia = 1, g1%nbg
-          cof(1) = g1%coef(ia,i)
-          if (cof(1) .NE. 0.0d0) then 
-             do ib = 1, g2%nbg
-                cof(2) = g2%coef(ib,j)
-                if (   cof(2)  .NE. 0.0d0  ) then
+
+     class(integ),    intent(inout) :: this
+     class(gaussian), intent(inout) :: ga, gb
+       real(8),       intent(inout) :: C(3), Zn
+       integer,       intent(in)    :: li, lj, ifunc, jfunc
+       integer                      :: iSPDF, jSPDF, inbg, jnbg
+       real(8)                      :: V_col, nuc_attraction
+
+
+       do iSPDF = 1, SPDF(li)
+
+          ga%shell = shells(li,iSPDF,:)
+
+          do jSPDF = 1, SPDF(lj)
+
+             gb%shell = shells(lj,jSPDF,:)
+
+             V_col = 0.0d0
+             do inbg = 1, ga%nbg
+
+                if ( ga%coef( inbg,ifunc)== 0) cycle
+
+                do jnbg = 1, gb%nbg
+
+                   if ( gb%coef( jnbg,jfunc) == 0) cycle
+             
                    !V_col = V_col + g1%norm(ia) * g2%norm(ib) * g1%coef(ia,i) * g2%coef(ib,j) * &
-                   V_col = V_col + cof(1) * cof(2) * & 
-                        nuc_attraction( g1%exps(ia), g1%shell, g1%origin, g2%exps(ib),  g2%shell, g2%origin, C)
-                end if
-             end do
-          end if
+                    V_col = V_col + ga%coef(inbg,ifunc) * gb%coef(jnbg,jfunc) * & 
+                        nuc_attraction( ga%exps(inbg), ga%shell, ga%origin, gb%exps(jnbg),  gb%shell, gb%origin, C)
+ 
+
+                end do
+             end do   
+             this%Mat(iSPDF,jSPDF) = V_col
+          end do
        end do
-       this%int_val = V_col
+       !Multiply ga charge
+       this%Mat = Zn*this%Mat
+
   end subroutine
 
 !459 function elec_repulsion( a, lmn1, RA, b, lmn2, RB, c, lmn3, RC, d, lmn4, RD) result(val)
